@@ -34,6 +34,11 @@ import argparse
 #
 from pxr import Usd
 
+#
+# @todo: USDOtio imports here 
+#
+
+
 class UsdOtio:
     """
     Class to add or extract an .otio json data file from a .usd fle
@@ -48,8 +53,10 @@ class UsdOtio:
         """
         if self.mode == 'add':
             self.run_otio_add()
-        else:
+        elif self.mode == 'save':
             self.run_otio_save()
+        else:
+            raise RuntimeError('Uninplemented mode yet - Patches welcome!')
         
     def run_otio_save(self):
         """
@@ -143,7 +150,7 @@ class UsdOtio:
         # Verify the jsonData attribute is empty
         #
         old_data = otio_prim.GetAttribute('jsonData').Get()
-        if old_data and old_data != '' and old_data != "Missing .otio's jsonData!":
+        if old_data and old_data != "Missing .otio's jsonData!":
             print(f'\n\nWarning jsonData for {otio_path} is not empty:')
             print(f'{old_data[:75]}...')
             self.continue_prompt()
@@ -164,39 +171,65 @@ class UsdOtio:
         """
     
         description="""
-        A program to embed and extract an .otio file from a .usd file.
+        A program to embed and extract an .otio file from a .usd file and to
+        convert Omniverse's sequencer to an .usd file with embedded .otio
+        data.
         """
             
         parser = argparse.ArgumentParser(description=description)
-            
+
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='Enable verbose mode.')
-        parser.add_argument('-p', '--path', type=str, nargs='?', const='/', 
-                            help='USD path to attach or extract .otio '
-                            'primitive to.  If no path provides, defaults '
-                            'to "/".')
+        subparsers = parser.add_subparsers(dest='mode',
+                                           help='Mode of operation')
+        parser.add_argument('usd_file', type=str, help='Name of .usd file to add or extract otio data')
         parser.add_argument('-o', '--usd-output-file', type=str, nargs='?',
                             help='USD output file.  '
                             'If no output file is provided, defaults to'
                             'overwrite the same usd file.')
+        
+            
+        
 
-        # Making mode a positional argument
-        parser.add_argument('mode', choices=['add', 'save'], help='Select mode: add .otio file to .usd or save .otio file from .usd.')
-            
-        parser.add_argument('otio_file', type=str, help='Name of .otio file to add or save.')
-        parser.add_argument('usd_file', type=str, help='Name of .usd file to add or extract otio data')
-            
+        #
+        # Add parser
+        #
+        add_parser = subparsers.add_parser('add', help='Add mode')
+        
+        add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
+                                const='/', 
+                                help='USD path to attach or extract .otio '
+                                'primitive to.  If no path provides, defaults '
+                                'to "/".')
+        add_parser.add_argument('otio_file', type=str, help='Name of .otio file to add or save.')
+
+        #
+        # Save parser
+        #
+        save_parser = subparsers.add_parser('save', help='Save mode')
+        save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
+                                 const='/', 
+                                 help='USD path to attach or extract .otio '
+                                 'primitive to.  If no path provides, defaults '
+                                 'to "/".')
+        save_parser.add_argument('otio_file', type=str, help='Name of .otio file to add or save.')
+        
+        v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
+        
         args = parser.parse_args()
 
         #
         # Copy arguments to class
         #
         self.verbose = args.verbose
-        self.path = args.path
-        self.mode = args.mode
-        self.otio_file = args.otio_file
         self.usd_file  = args.usd_file
         self.output_file = args.usd_output_file
+
+        if args.mode != 'v2':
+            self.path = args.path
+            self.mode = args.mode
+            self.otio_file = args.otio_file
+            
         if not self.output_file:
             self.output_file = self.usd_file
         
