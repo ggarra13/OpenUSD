@@ -1,0 +1,27 @@
+#usda 1.0
+(
+    """ This file contains an example schemata for code generation using
+        usdGenSchema.
+    """
+    subLayers = [
+        @usd/schema.usda@
+    ]
+) 
+
+over "GLOBAL" (
+    customData = {
+        string libraryName       = "usdOtio"
+        string libraryPath       = "."
+    }
+) {
+}
+
+
+# Note that it does not specify a typeName.
+class Otio "Otio" (
+    doc = """Defines a concrete OpenTimelineIO primtive schema."""
+    inherits = </Typed>
+)  
+{
+    uniform string jsonData = "Missing .otio's jsonData!"
+}
