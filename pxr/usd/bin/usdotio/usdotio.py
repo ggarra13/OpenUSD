@@ -192,7 +192,7 @@ class UsdOtio:
         
 
         #
-        # Add parser
+        # 'add' parser
         #
         add_parser = subparsers.add_parser('add', help='Add mode')
         
@@ -204,7 +204,7 @@ class UsdOtio:
         add_parser.add_argument('otio_file', type=str, help='Name of .otio file to add or save.')
 
         #
-        # Save parser
+        # 'save' parser
         #
         save_parser = subparsers.add_parser('save', help='Save mode')
         save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -214,6 +214,9 @@ class UsdOtio:
                                  'to "/".')
         save_parser.add_argument('otio_file', type=str, help='Name of .otio file to add or save.')
         
+        #
+        # 'v2' parser
+        #
         v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
         
         args = parser.parse_args()
@@ -222,12 +225,13 @@ class UsdOtio:
         # Copy arguments to class
         #
         self.verbose = args.verbose
+        self.mode = args.mode
         self.usd_file  = args.usd_file
         self.output_file = args.usd_output_file
+        self.path = None
 
         if args.mode != 'v2':
             self.path = args.path
-            self.mode = args.mode
             self.otio_file = args.otio_file
             
         if not self.output_file:
@@ -249,7 +253,7 @@ class UsdOtio:
             if self.mode == "add":
                 print(f"Trying to add {self.otio_file} to {self.usd_file}, USD path {self.path}...")
                 print(f'Saving to {self.output_file}')
-            else:
+            elif self.mode == 'save':
                 print(f"Trying to get otio data from USD path {self.path}...")
 
         else:
