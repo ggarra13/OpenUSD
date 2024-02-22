@@ -208,8 +208,8 @@ class UsdOtio:
         #
         old_data = otio_prim.GetAttribute('jsonData').Get()
         if old_data and old_data != "Missing .otio's jsonData!":
-            print(f'\n\nWarning jsonData for {otio_path} is not empty:')
-            print(f'{old_data[:75]}...')
+            print(f'WARNING: jsonData for {otio_path} is not empty:')
+            print(f'{old_data[:512]}...etc...')
             self.continue_prompt()
             
         #
@@ -363,12 +363,16 @@ class UsdOtio:
             self.path = '/otio'
                 
         if self.mode == "add":
-            print(f'Adding "{self.otio_file}" to "{self.usd_file}", '
-                  f'USD path "{self.path}"...\n')
-            print(f'Saving to {self.output_file}\n')
+            print(f'\nAdding "{self.otio_file}" to\n'
+                  f'USD path "{self.path}" in\n'
+                  f'"{self.usd_file}"...\n')
+            if self.output_file != self.usd_file:
+                print(f'Saving to {self.output_file}')
+            else:
+                print('WARNING: Overwriting USD file.') 
         elif self.mode == 'save':
-            print(f'Getting otio data from USD path "{self.path}"...\n')
-            print(f'Saving to "{self.otio_file}"\n')
+            print(f'\nGetting otio data from USD path "{self.path}"...\n')
+            print(f'Saving to "{self.otio_file}"')
 
     def continue_prompt(self):
         """
