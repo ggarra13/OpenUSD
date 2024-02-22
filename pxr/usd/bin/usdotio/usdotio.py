@@ -30,12 +30,51 @@ import sys, os
 import argparse
 
 #
+# Instead of relying in the user environment being set, we will modify this
+# from within python so that the script will work fine in all OSes.
+#
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Split the path based on the directory separator
+path_parts = script_dir.split(os.path.sep)
+
+# Remove the last element from the path_parts list
+path_parts.pop()
+
+# Join the remaining parts back together to form the new path
+install_path = os.path.sep.join(path_parts)
+
+#
+# Otio plugin dir
+#
+share_parts = [install_path, 'share', 'usd', 'examples', 'plugin', 'usdOtio']
+otio_plugin_dir = os.path.sep.join(share_parts)
+
+#
+# Add usdOtio directory to PXR_PLUGINPATH_NAME
+#
+plugin_path = os.environ.get('PXR_PLUGINPATH_NAME', '')
+os.environ['PXR_PLUGINPATH_NAME'] = plugin_path + os.pathsep + otio_plugin_dir
+
+#
+# Usd python dir
+#
+usd_python_parts = [install_path, 'lib', 'python']
+usd_python_path = os.path.sep.join(usd_python_parts)
+
+#
+# Modify sys.path
+# 
+sys.path.insert(0, otio_plugin_dir)
+sys.path.insert(0, usd_python_path)
+
+#
 # USD imports
 #
 from pxr import Usd
 
 #
-# @todo: USDOtio imports here 
+# @todo: USDOtio helper classes' imports here 
 #
 
 
