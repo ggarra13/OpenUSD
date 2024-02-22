@@ -84,6 +84,7 @@ class UsdOtio:
     Class to add or extract an .otio json data file from a .usd fle
     """
     def __init__(self):
+        self.path = self.output_file = None
         self.parse_arguments()
         self.run()
 
@@ -261,7 +262,7 @@ class UsdOtio:
         add_parser.add_argument('-v', '--verbose', action='store_true',
                                 help='Enable verbose mode.')
         add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
-                                const='/', 
+                                const='/otio', 
                                 help='USD path to attach or extract .otio '
                                 'primitive to.  If no path provides, defaults '
                                 'to "/otio".')
@@ -312,15 +313,18 @@ class UsdOtio:
         #
         # Copy arguments to class
         #
-        self.verbose = args.verbose
         self.mode = args.mode
+        if not self.mode:
+            print(parser.format_help())
+            exit(1)
+            
+        self.verbose = args.verbose
         self.usd_file  = args.usd_file
-        self.path = self.output_file = None
 
-        if args.mode != 'save':
+        if self.mode != 'save' and self.mode:
             self.output_file = args.usd_output_file
         
-        if args.mode != 'v2':
+        if self.mode != 'v2':
             self.path = args.usd_path
             self.otio_file = args.otio_file
             
