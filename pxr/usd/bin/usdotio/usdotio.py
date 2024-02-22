@@ -1,4 +1,4 @@
-#!/pxrpythonsubst
+#!/usr/bin/python3
 #
 # Copyright 2024 Gonzalo Garramuño
 #
@@ -74,7 +74,8 @@ sys.path.insert(0, usd_python_path)
 from pxr import Usd
 
 #
-# @todo: USDOtio helper classes' imports here 
+# @todo: USDOtio helper classes' imports here, as parsing the Omniverse
+#        sequencer will be a new class.
 #
 
 
@@ -94,6 +95,8 @@ class UsdOtio:
             self.run_otio_add()
         elif self.mode == 'save':
             self.run_otio_save()
+        elif self.mode == 'v2':
+            raise RuntimeError('Uninplemented mode yet - Try later!')
         else:
             raise RuntimeError('Uninplemented mode yet - Patches welcome!')
         
@@ -106,7 +109,7 @@ class UsdOtio:
         # 
         stage = Usd.Stage.Open(self.usd_file)
 
-        usd_path = self.path + 'otio'
+        usd_path = self.path
 
         #
         # Get primitive at path
@@ -114,8 +117,12 @@ class UsdOtio:
         otio_prim = stage.GetPrimAtPath(usd_path)
         if not otio_prim:
             print(f'Invalid USD path "{usd_path}" for Otio primitive!')
-            print('Use -p <path> for passing the path to the root '
-                  'containing Otio primitive "otio".')
+            print('Use -p <path> for passing the path to the '
+                  'Otio primitive.\n')
+            print('Valid Otio primitives in stage:\n')
+            for x in stage.Traverse():
+                if x.GetTypeName() == 'Otio':
+                    print(f'\t{x} is an Otio primitive.')
             exit(1)
 
         #
@@ -132,7 +139,7 @@ class UsdOtio:
         # Check if otio file already exists
         #
         if os.path.isfile(self.otio_file):
-            print(f'{self.otio_file} already exists.  Will overwrite it.')
+            print(f'"{self.otio_file}" already exists.  Will overwrite it.')
             self.continue_prompt()
         
         #
@@ -157,7 +164,7 @@ class UsdOtio:
         #
         # Create an USD otio primitive at path/otio.
         #
-        otio_path = self.path + 'otio'
+        otio_path = self.path
         otio_prim = stage.DefinePrim(otio_path, 'Otio')
 
         #
@@ -169,7 +176,14 @@ class UsdOtio:
         except ImportError:
             print("WARNING: Not validating .otio data!")
             validate_otio = False
-                
+            
+        #
+        # Check if .otio file exists
+        #
+        if not os.path.exists(self.otio_file):
+            print(f'OpenTimelineIO file "{self.otio_file}" does not exist!')
+            exit(1)
+        
         #
         # Try to validate the otio file
         #
@@ -177,7 +191,11 @@ class UsdOtio:
             try:
                 timeline = otio.adapters.read_from_file(self.otio_file)
             except:
-                print("ERROR: Invalid .otio file or could not convert with installed adapters")
+                if self.otio_file.endswith('.otio'):
+                    print(f'ERROR: Corrupt .otio file "{self.otio_file}"!')
+                else:
+                    print(f'ERROR: Could not convert "{self.otio_file}" with '
+                          'any adapter!')
                 exit(1)
             json_data = timeline.to_json_string()
         else:
@@ -204,6 +222,20 @@ class UsdOtio:
         #
         stage.Export(self.output_file)
 
+    @staticmethod
+    def valid_usd(usd):
+        """
+        Validate a USD file by checking its extension.
+
+        Args:
+            usd (str): USD filename
+        """
+        if usd.endswith('.usd') or usd.endswith('.usda') or \
+           usd.endswith('.usdz') or usd.endswith('.usdc'):
+            return
+        print(f'Invalid extension for USD file: {usd}')
+        exit(1)
+        
     def parse_arguments(self):
         """
         Parse the command-line's arguments
@@ -216,16 +248,8 @@ class UsdOtio:
         """
             
         parser = argparse.ArgumentParser(description=description)
-
-        parser.add_argument('-v', '--verbose', action='store_true',
-                            help='Enable verbose mode.')
         subparsers = parser.add_subparsers(dest='mode',
                                            help='Mode of operation')
-        parser.add_argument('usd_file', type=str, help='Name of .usd file to add or extract otio data')
-        parser.add_argument('-o', '--usd-output-file', type=str, nargs='?',
-                            help='USD output file.  '
-                            'If no output file is provided, defaults to'
-                            'overwrite the same usd file.')
         
             
         
@@ -234,29 +258,54 @@ class UsdOtio:
         # 'add' parser
         #
         add_parser = subparsers.add_parser('add', help='Add mode')
-        
+        add_parser.add_argument('-v', '--verbose', action='store_true',
+                                help='Enable verbose mode.')
         add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
                                 const='/', 
                                 help='USD path to attach or extract .otio '
                                 'primitive to.  If no path provides, defaults '
-                                'to "/".')
-        add_parser.add_argument('otio_file', type=str, help='Name of .otio file to add or save.')
+                                'to "/otio".')
+        add_parser.add_argument('otio_file', type=str,
+                                help='Name of .otio file to add.')
+        add_parser.add_argument('usd_file', type=str,
+                                help='Name of .usd file to add otio data')
+        add_parser.add_argument('-o', '--usd-output-file', type=str, nargs='?',
+                                help='USD output file.  '
+                                'If no output file is provided, defaults to'
+                                'overwrite the same usd file.')
 
         #
         # 'save' parser
         #
         save_parser = subparsers.add_parser('save', help='Save mode')
+        save_parser.add_argument('-v', '--verbose', action='store_true',
+                                 help='Enable verbose mode.')
         save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
-                                 const='/', 
+                                 const='/otio', 
                                  help='USD path to attach or extract .otio '
                                  'primitive to.  If no path provides, defaults '
                                  'to "/".')
-        save_parser.add_argument('otio_file', type=str, help='Name of .otio file to add or save.')
+        save_parser.add_argument('otio_file', type=str,
+                                 help='Name of .otio file to add or save.')
+        save_parser.add_argument('usd_file', type=str,
+                                 help='Name of .usd file to extract otio data')
         
         #
         # 'v2' parser
         #
         v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
+        v2_parser.add_argument('-v', '--verbose', action='store_true',
+                               help='Enable verbose mode.')
+        v2_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
+                               const='/otio', 
+                               help='USD path to attach or extract .otio '
+                               'primitive to.  If no path provides, defaults '
+                               'to "/".')
+        v2_parser.add_argument('usd_file', type=str, help='Name of .usd file to add or extract otio data')
+        v2_parser.add_argument('-o', '--usd-output-file', type=str, nargs='?',
+                               help='USD output file.  '
+                               'If no output file is provided, defaults to'
+                               'overwrite the same usd file.')
         
         args = parser.parse_args()
 
@@ -266,11 +315,13 @@ class UsdOtio:
         self.verbose = args.verbose
         self.mode = args.mode
         self.usd_file  = args.usd_file
-        self.output_file = args.usd_output_file
-        self.path = None
+        self.path = self.output_file = None
 
+        if args.mode != 'save':
+            self.output_file = args.usd_output_file
+        
         if args.mode != 'v2':
-            self.path = args.path
+            self.path = args.usd_path
             self.otio_file = args.otio_file
             
         if not self.output_file:
@@ -278,7 +329,29 @@ class UsdOtio:
         
         if self.verbose:
             print('Verbose mode enabled!')
+            print('\nEnvironment:\n')
+            print(f'PXR_PLUGINPATH_NAME={os.environ["PXR_PLUGINPATH_NAME"]}')
+            print('')
+            print(f'sys.path={os.path.pathsep.join(sys.path)}')
+            print('')
             print(f'Selected mode: {self.mode}')
+            print('')
+            
+        #
+        # Validate arguments
+        #
+        if self.otio_file:
+            if self.otio_file.endswith('.otioz'):
+                print(f'.otioz files currently are not supported.  Sorry!')
+                exit(1)
+
+        self.valid_usd(self.usd_file)
+        if not os.path.isfile(self.usd_file):
+            print(f'"{self.usd_file}" is not a file!')
+            exit(1)
+            
+        if self.output_file:
+            self.valid_usd(self.output_file)
                 
         if self.path:
             #
@@ -286,17 +359,16 @@ class UsdOtio:
             #
             if self.path[0] != '/':
                 self.path = '/' + self.path
-            if self.path[-1] != '/':
-                self.path += '/'
-                
-            if self.mode == "add":
-                print(f"Trying to add {self.otio_file} to {self.usd_file}, USD path {self.path}...")
-                print(f'Saving to {self.output_file}')
-            elif self.mode == 'save':
-                print(f"Trying to get otio data from USD path {self.path}...")
-
         else:
-            self.path = '/'
+            self.path = '/otio'
+                
+        if self.mode == "add":
+            print(f'Adding "{self.otio_file}" to "{self.usd_file}", '
+                  f'USD path "{self.path}"...\n')
+            print(f'Saving to {self.output_file}\n')
+        elif self.mode == 'save':
+            print(f'Getting otio data from USD path "{self.path}"...\n')
+            print(f'Saving to "{self.otio_file}"\n')
 
     def continue_prompt(self):
         """
