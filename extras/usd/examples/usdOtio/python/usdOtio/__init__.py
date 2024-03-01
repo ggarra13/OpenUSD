@@ -1,3 +1,0 @@
-
-
-print("Initializing otioUSD")

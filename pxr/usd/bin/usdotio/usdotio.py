@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 #
 # Copyright 2024 Gonzalo Garramuño
 #
@@ -27,7 +27,7 @@
 # Python standard imports
 #
 import sys, os
-import argparse
+import argparse, json
 
 #
 # Instead of relying in the user environment being set, we will modify this
@@ -71,13 +71,40 @@ sys.path.insert(0, usd_python_path)
 #
 # USD imports
 #
-from pxr import Usd
+try:
+    from pxr import Usd
+except ImportError:
+    print(f'''
+"pxr" python module not found.  Check PYTHONPATH and LD_LIBRARY_PATH on Linux or
+macOS.
+Check PATH on Windows.
+''')
+    exit(1)
 
 #
-# @todo: USDOtio helper classes' imports here, as parsing the Omniverse
-#        sequencer will be a new class.
+# OpentimelineIO imports
 #
+try:
+    import opentimelineio as otio
+except ImportError:
+    print(f'''
+Python's opentimelineio module not found!
 
+Please run:
+    pip install opentimelineio
+''')
+    exit(1)
+    
+#
+# usdOtio helper classes' imports here
+#
+from usdOtio.base import Base
+from usdOtio.timeline import Timeline
+from usdOtio.stack import Stack
+from usdOtio.track import Track
+from usdOtio.clip import Clip
+from usdOtio.transition import Transition
+from usdOtio.effect import Effect
 
 class UsdOtio:
     """
@@ -115,8 +142,8 @@ class UsdOtio:
         #
         # Get primitive at path
         #
-        otio_prim = stage.GetPrimAtPath(usd_path)
-        if not otio_prim:
+        usd_prim = stage.GetPrimAtPath(usd_path)
+        if not usd_prim:
             print(f'Invalid USD path "{usd_path}" for Otio primitive!')
             print('Use -p <path> for passing the path to the '
                   'Otio primitive.\n')
@@ -129,12 +156,12 @@ class UsdOtio:
         #
         # Check we have an Otio primitive
         #
-        prim_type = otio_prim.GetTypeName()
+        prim_type = usd_prim.GetTypeName()
         if prim_type != 'Otio':
             print(f'Invalid Otio primitive type. Is {prim_type}. ')
             exit(1)
 
-        json_data = otio_prim.GetAttribute('jsonData').Get()
+        json_data = usd_prim.GetAttribute('jsonData').Get()
 
         #
         # Check if otio file already exists
@@ -161,62 +188,93 @@ class UsdOtio:
         # Open the original scene file
         # 
         stage = Usd.Stage.Open(self.usd_file)
+                
+        #
+        # Try to validate the otio file
+        #
+        try:
+            timeline = otio.adapters.read_from_file(self.otio_file)
+        except:
+            if otio_file.endswith('.otio'):
+                print(f'ERROR: Corrupt .otio file "{otio_file}"!')
+            else:
+                print(f'ERROR: Could not convert "{otio_file}" with '
+                      'any adapter!')
+            exit(1)
+
 
         #
         # Create an USD otio primitive at path/otio.
         #
-        otio_path = self.path
-        otio_prim = stage.DefinePrim(otio_path, 'Otio')
-
-        #
-        # Check if we have opentimelineio python library to validate otio
-        #
-        try:
-            validate_otio = True
-            import opentimelineio as otio
-        except ImportError:
-            print("WARNING: Not validating .otio data!")
-            validate_otio = False
-            
-        #
-        # Check if .otio file exists
-        #
-        if not os.path.exists(self.otio_file):
-            print(f'OpenTimelineIO file "{self.otio_file}" does not exist!')
-            exit(1)
+        usd_path = self.path
         
-        #
-        # Try to validate the otio file
-        #
-        if validate_otio:
-            try:
-                timeline = otio.adapters.read_from_file(self.otio_file)
-            except:
-                if self.otio_file.endswith('.otio'):
-                    print(f'ERROR: Corrupt .otio file "{self.otio_file}"!')
-                else:
-                    print(f'ERROR: Could not convert "{self.otio_file}" with '
-                          'any adapter!')
-                exit(1)
-            json_data = timeline.to_json_string()
-        else:
-            # Read the JSON data from file
-            with open(self.otio_file, "r") as f:
-                json_data = f.read()
+        usd_otio_item = Timeline(timeline)
+        usd_otio_item.to_usd(stage, usd_path)
+        usd_otio_item.from_json_string(timeline.to_json_string())
+        
 
-        #
-        # Verify the jsonData attribute is empty
-        #
-        old_data = otio_prim.GetAttribute('jsonData').Get()
-        if old_data and old_data != "Missing .otio's jsonData!":
-            print(f'WARNING: jsonData for {otio_path} is not empty:')
-            print(f'{old_data[:512]}...etc...')
-            self.continue_prompt()
+        # Check if there's a stacks attribute
+        stack_path = usd_path + '/stack'
+        stack = None
+        if hasattr(timeline, "stacks"):
+            # Access the first stack if it exists
+            if timeline.stacks:
+                print("Retrieved the first stack:", first_stack)
+                stack = timeline.stacks[0]
+                usd_otio_item = Stack(stack)
+            else:
+                usd_otio_item = Stack()
+        else:
+            usd_otio_item = Stack()
             
-        #
-        # Attach the json data to the otio primitive
-        #
-        otio_prim.GetAttribute('jsonData').Set(json_data)
+        usd_otio_item.to_usd(stage, stack_path)
+        if stack:
+            usd_otio_item.from_json_string(stack.to_json_string())
+  
+        
+
+        track_index = 0
+        for track in timeline.tracks:
+
+            track_path = stack_path + f'/track_{track_index}'
+            usd_otio_item = Track(track)
+            usd_otio_item.to_usd(stage, track_path)
+            usd_otio_item.from_json_string(track.to_json_string())
+            
+            track_index += 1
+
+            clip_index = 0
+            transition_index = 0
+            effect_index = 0
+
+            for child in track:
+
+                usd_otio_item = None
+                usd_path = None
+
+                if isinstance(child, otio.schema.Clip):
+                    usd_path = track_path + f'/clip_{clip_index}'
+                    usd_otio_item = Clip(child)
+                    clip_index += 1
+                    # Do something with the Clip
+                elif isinstance(child, otio.schema.Transition):
+                    usd_path = track_path + f'/transition_{transition_index}'
+                    usd_otio_item = Transition(child)
+                    transition_index += 1
+                elif isinstance(child, otio.schema.Effect):
+                    usd_path = track_path + f'/effect_{effect_index}'
+                    usd_otio_item = Clip(child)
+                    effect_index += 1
+                else:
+                    print('Not creating anything!')
+
+                if usd_otio_item:
+                    usd_otio_item.to_usd(stage, usd_path)
+                    usd_otio_item.from_json_string(child.to_json_string())
+
+            for effect in track.effects:
+                print(f'effect name: {effect.name}')
+                print(f'effect target: {effect.target}')
         
         #
         # Export modified stage to output file
@@ -268,7 +326,7 @@ class UsdOtio:
                                 help='Answer yes to all questions')
         add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
                                 const='/otio', 
-                                help='USD path to attach .otio '
+                                help='USD path to attach or extract .otio '
                                 'primitive to.  If no path provides, defaults '
                                 'to "/otio".')
         add_parser.add_argument('otio_file', type=str,
@@ -290,8 +348,8 @@ class UsdOtio:
                                  help='Answer yes to all questions')
         save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
                                  const='/otio', 
-                                 help='USD path to extract .otio primitive '
-                                 'from.  If no path provides, defaults '
+                                 help='USD path to attach or extract .otio '
+                                 'primitive to.  If no path provides, defaults '
                                  'to "/".')
         save_parser.add_argument('otio_file', type=str,
                                  help='Name of .otio file to add or save.')
@@ -327,13 +385,13 @@ class UsdOtio:
             print(parser.format_help())
             exit(1)
             
-        self.verbose = args.verbose
+        self.verbose = Base.verbose = args.verbose
         self.usd_file  = args.usd_file
         self.yes       = args.yes
 
         if self.mode != 'save':
             self.output_file = args.usd_output_file
-        
+
         if self.mode != 'v2':
             self.path = args.usd_path
             self.otio_file = args.otio_file
@@ -379,15 +437,15 @@ class UsdOtio:
         else:
             self.path = '/otio'
                 
-        if self.mode == "add":
-            print(f'\nAdding "{self.otio_file}" to\n'
-                  f'USD path "{self.path}" in\n'
-                  f'"{self.usd_file}"...\n')
+            if self.mode == "add":
+                print(f'\nAdding "{self.otio_file}" to\n'
+                      f'USD path "{self.path}" in\n'
+                      f'"{self.usd_file}"...\n')
             if self.output_file != self.usd_file:
                 print(f'Saving to {self.output_file}')
-        elif self.mode == 'save':
-            print(f'\nGetting otio data from USD path "{self.path}"...\n')
-            print(f'Saving to "{self.otio_file}"')
+            elif self.mode == 'save':
+                print(f'\nGetting otio data from USD path "{self.path}"...\n')
+                print(f'Saving to "{self.otio_file}"')
 
     def continue_prompt(self):
         """
