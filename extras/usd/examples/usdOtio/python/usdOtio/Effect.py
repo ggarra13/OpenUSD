@@ -1,15 +1,9 @@
 
+from usdOtio import Base
 
-class Effect:
-    def __init__(self):
-        pass
+class Effect(usdOtio.Base):
     
-    def __init__(self, otio_item):
-        self.jsonData = otio_item.to_json_string()
-
-    def from_json_string(self, s):
-        self.jsonData = json.loads(s)
-        
-    def to_json_string(self):
-        return json.dumps(self.jsonData)
+    def to_usd(self, stage, usd_path):
+        usd_prim = stage.DefinePrim(usd_path, 'OtioEffect')
+        return usd_prim
 

@@ -1,6 +1,7 @@
 
+from usdOtio import Base
 
-class Stack:
+class Stack(usdOtio.Base):
     def __init__(self):
         self.children = []
         self.jsonData = {}
@@ -15,8 +16,10 @@ class Stack:
         self.jsonData.pop('children')
 
     def to_json_string(self):
-        self.jsonData['children'] = '[';
         json_strings = [child.to_json_string() for child in self.children]
-        self.jsonData['children'] += ','.join(json_strings)
-        self.jsonData['children'] += ']';
+        self.jsonData['children'] = json_strings
         return json.dumps(self.jsonData)
+
+    def to_usd(self, stage, usd_path):
+        usd_prim = stage.DefinePrim(usd_path, 'OtioStack')
+        return usd_prim

@@ -1,6 +1,7 @@
 
+from usdOtio import Base
 
-class Timeline:
+class Timeline(usdOtio.Base):
     def __init__(self):
         self.tracks = []
         self.jsonData = {}
@@ -19,4 +20,9 @@ class Timeline:
         
     def to_json_string(self):
         json_strings = [track.to_json_string() for track in self.tracks]
-        return ','.join(json_strings)
+        self.jsonData['tracks'] = json_strings
+        return json.dumps(self.jsonData)
+
+    def to_usd(self, stage, usd_path):
+        usd_prim = stage.DefinePrim(usd_path, 'OtioTimeline')
+        return usd_prim

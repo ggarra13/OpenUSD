@@ -1,6 +1,7 @@
 
+from usdOtio import Base
 
-class Track:
+class Track(usdOtio.Base):
     def __init__(self):
         self.children = []
         self.jsonData = {}
@@ -14,8 +15,6 @@ class Track:
         self.jsonData.pop('children')
 
     def to_json_string(self):
-        self.jsonData['children'] = '[';
         json_strings = [child.to_json_string() for child in self.children]
-        self.jsonData['children'] += ','.join(json_strings)
-        self.jsonData['children'] += ']';
+        self.jsonData['children'] = json_strings
         return json.dumps(self.jsonData)

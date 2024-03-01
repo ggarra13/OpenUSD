@@ -1,14 +1,10 @@
 
+from usdOtio import Base
 
-class Transition:
-    def __init__(self):
-        pass
-
-    def __init__(self, otio_item):
-        self.jsonData = otio_item.to_json_string()
+class Transition(usdOtio.Base):
     
-    def from_json_string(self, s):
-        self.jsonData = json.loads(s)
-        
-    def to_json_string(self):
-        return json.dumps(self.jsonData)
+    def to_usd(self, stage, usd_path):
+        usd_prim = stage.DefinePrim(usd_path, 'OtioTransition')
+        return usd_prim
+
+
