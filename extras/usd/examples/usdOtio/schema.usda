@@ -12,6 +12,7 @@ over "GLOBAL" (
     customData = {
         string libraryName       = "usdOtio"
         string libraryPath       = "."
+	bool skipCodeGeneration  = true
     }
 ) {
 }
@@ -19,9 +20,56 @@ over "GLOBAL" (
 
 # Note that it does not specify a typeName.
 class Otio "Otio" (
-    doc = """Defines a concrete OpenTimelineIO primtive schema."""
+    doc = """Defines a concrete OpenTimelineIO primitive root schema."""
     inherits = </Typed>
 )  
 {
-    uniform string jsonData = "Missing .otio's jsonData!"
+}
+
+class OtioTimeline "OtioTimeline" (
+    doc = """Defines a concrete OpenTimelineIO timeline schema."""
+    inherits = </Typed>
+)  
+{
+	uniform string jsonData = ""
+}
+
+class OtioStack "OtioStack" (
+    doc = """Defines a concrete OpenTimelineIO stack schema."""
+    inherits = </Typed>
+)  
+{
+	uniform string jsonData = ""
+}
+
+class OtioTrack "OtioTrack" (
+    doc = """Defines a concrete OpenTimelineIO track schema."""
+    inherits = </Typed>
+)  
+{
+	uniform string jsonData = ""
+}
+
+class OtioClip "OtioClip" (
+    doc = """Defines a concrete OpenTimelineIO clip schema."""
+    inherits = </Typed>
+)  
+{
+	uniform string jsonData = ""
+}
+
+class OtioTransition "OtioTransition" (
+    doc = """Defines a concrete OpenTimelineIO transition schema."""
+    inherits = </Typed>
+)  
+{
+	uniform string jsonData = ""
+}
+
+class OtioEffect "OtioEffect" (
+    doc = """Defines a concrete OpenTimelineIO effect schema."""
+    inherits = </Typed>
+)  
+{
+	uniform string jsonData = ""
 }

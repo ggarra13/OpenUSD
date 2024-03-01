@@ -4,9 +4,50 @@
 )
 
 class Otio "Otio" (
-    doc = "Defines a concrete OpenTimelineIO primtive schema."
+    doc = "Defines a concrete OpenTimelineIO primitive root schema."
 )
 {
-    uniform string jsonData = "Missing .otio's jsonData!"
+}
+
+class OtioTimeline "OtioTimeline" (
+    doc = "Defines a concrete OpenTimelineIO timeline schema."
+)
+{
+    uniform string jsonData = ""
+}
+
+class OtioStack "OtioStack" (
+    doc = "Defines a concrete OpenTimelineIO stack schema."
+)
+{
+    uniform string jsonData = ""
+}
+
+class OtioTrack "OtioTrack" (
+    doc = "Defines a concrete OpenTimelineIO track schema."
+)
+{
+    uniform string jsonData = ""
+}
+
+class OtioClip "OtioClip" (
+    doc = "Defines a concrete OpenTimelineIO clip schema."
+)
+{
+    uniform string jsonData = ""
+}
+
+class OtioTransition "OtioTransition" (
+    doc = "Defines a concrete OpenTimelineIO transition schema."
+)
+{
+    uniform string jsonData = ""
+}
+
+class OtioEffect "OtioEffect" (
+    doc = "Defines a concrete OpenTimelineIO effect schema."
+)
+{
+    uniform string jsonData = ""
 }
 

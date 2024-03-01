@@ -8,3 +8,8 @@ install(
     
     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/usd/examples/plugin/usdOtio
     )
+
+install(
+    DIRECTORY python    
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/usd/examples/plugin/usdOtio
+    )

@@ -221,6 +221,9 @@ class UsdOtio:
         #
         # Export modified stage to output file
         #
+        if self.output_file == self.usd_file:
+            print('WARNING: Overwriting USD file.')
+            self.continue_prompt()
         stage.Export(self.output_file)
 
     @staticmethod
@@ -261,9 +264,11 @@ class UsdOtio:
         add_parser = subparsers.add_parser('add', help='Add mode')
         add_parser.add_argument('-v', '--verbose', action='store_true',
                                 help='Enable verbose mode.')
+        add_parser.add_argument('-y', '--yes', action='store_true',
+                                help='Answer yes to all questions')
         add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
                                 const='/otio', 
-                                help='USD path to attach or extract .otio '
+                                help='USD path to attach .otio '
                                 'primitive to.  If no path provides, defaults '
                                 'to "/otio".')
         add_parser.add_argument('otio_file', type=str,
@@ -281,10 +286,12 @@ class UsdOtio:
         save_parser = subparsers.add_parser('save', help='Save mode')
         save_parser.add_argument('-v', '--verbose', action='store_true',
                                  help='Enable verbose mode.')
+        save_parser.add_argument('-y', '--yes', action='store_true',
+                                 help='Answer yes to all questions')
         save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
                                  const='/otio', 
-                                 help='USD path to attach or extract .otio '
-                                 'primitive to.  If no path provides, defaults '
+                                 help='USD path to extract .otio primitive '
+                                 'from.  If no path provides, defaults '
                                  'to "/".')
         save_parser.add_argument('otio_file', type=str,
                                  help='Name of .otio file to add or save.')
@@ -297,6 +304,8 @@ class UsdOtio:
         v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
         v2_parser.add_argument('-v', '--verbose', action='store_true',
                                help='Enable verbose mode.')
+        v2_parser.add_argument('-y', '--yes', action='store_true',
+                               help='Answer yes to all questions')
         v2_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
                                const='/otio', 
                                help='USD path to attach or extract .otio '
@@ -320,8 +329,9 @@ class UsdOtio:
             
         self.verbose = args.verbose
         self.usd_file  = args.usd_file
+        self.yes       = args.yes
 
-        if self.mode != 'save' and self.mode:
+        if self.mode != 'save':
             self.output_file = args.usd_output_file
         
         if self.mode != 'v2':
@@ -350,6 +360,9 @@ class UsdOtio:
                 exit(1)
 
         self.valid_usd(self.usd_file)
+        if not os.path.exists(self.usd_file):
+            print(f'"{self.usd_file}" does not exist!')
+            exit(1)
         if not os.path.isfile(self.usd_file):
             print(f'"{self.usd_file}" is not a file!')
             exit(1)
@@ -372,8 +385,6 @@ class UsdOtio:
                   f'"{self.usd_file}"...\n')
             if self.output_file != self.usd_file:
                 print(f'Saving to {self.output_file}')
-            else:
-                print('WARNING: Overwriting USD file.') 
         elif self.mode == 'save':
             print(f'\nGetting otio data from USD path "{self.path}"...\n')
             print(f'Saving to "{self.otio_file}"')
@@ -382,6 +393,10 @@ class UsdOtio:
         """
         Prompt user to continue or cancel.
         """
+        if self.yes:
+            print("\nShall I continue (y/n)? ")
+            print('y\n')
+            return
         response = input("\nShall I continue (y/n)? ")
         if response.lower() == 'y':
             return
