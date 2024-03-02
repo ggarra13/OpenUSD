@@ -1,10 +1,9 @@
 
 import json
 
-class Base:
+from usdOtio.options import Options
 
-    yes = False
-    verbose = False
+class Base:
     
     def __init__(self, otio_item = None):
         self.jsonData = {}
@@ -17,6 +16,9 @@ class Base:
     def to_json_string(self):
         return json.dumps(self.jsonData)
 
+    def from_usd(self):
+        pass
+    
     def to_usd(self, stage, usd_path):
         pass
 
@@ -28,27 +30,14 @@ class Base:
         if old_data and old_data != '':
             print(f'\n\nWarning jsonData for {usd_path} is not empty:')
             print(f'{old_data[:256]}...')
-            self._continue_prompt()
+            Options.continue_prompt()
             
         #
         # Attach the json data to the otio primitive
         #
         usd_prim.GetAttribute('jsonData').Set(self.to_json_string())
-        
-    def _continue_prompt(self):
-        """
-        Prompt user to continue or cancel.
-        """
-        if Base.yes:
-            print("\nShall I continue (y/n)? ")
-            print('y\n')
-            return
-        response = input("\nShall I continue (y/n)? ")
-        if response.lower() == 'y':
-            return
-        elif response.lower() == 'n':
-            print('Aborting...')
-            exit(1)
-        else:
-            print("Invalid input. Please enter 'y' or 'n'.")
-            self.continue_prompt()
+
+    def _report(self, usd_prim, usd_path):
+        if Options.verbose:
+            prim_type = usd_prim.GetTypeName()
+            print(f'Created {prim_type} at {usd_path}')

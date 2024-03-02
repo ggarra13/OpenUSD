@@ -4,9 +4,10 @@
 )
 
 class Otio "Otio" (
-    doc = "Defines a concrete OpenTimelineIO primitive root schema."
+    doc = "Defines an abstract OpenTimelineIO primitive root schema."
 )
 {
+    uniform string jsonData = ""
 }
 
 class OtioTimeline "OtioTimeline" (
@@ -31,6 +32,13 @@ class OtioTrack "OtioTrack" (
 }
 
 class OtioClip "OtioClip" (
+    doc = "Defines a concrete OpenTimelineIO clip schema."
+)
+{
+    uniform string jsonData = ""
+}
+
+class OtioGap "OtioGap" (
     doc = "Defines a concrete OpenTimelineIO clip schema."
 )
 {

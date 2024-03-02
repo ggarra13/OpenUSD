@@ -98,13 +98,16 @@ Please run:
 #
 # usdOtio helper classes' imports here
 #
-from usdOtio.base import Base
-from usdOtio.timeline import Timeline
-from usdOtio.stack import Stack
-from usdOtio.track import Track
+from usdOtio.options import Options
 from usdOtio.clip import Clip
+from usdOtio.gap import Gap
+from usdOtio.stack import Stack
+from usdOtio.timeline import Timeline
 from usdOtio.transition import Transition
+from usdOtio.track import Track
 from usdOtio.effect import Effect
+
+#for usdOtio.otioadd import OtioAdd
 
 class UsdOtio:
     """
@@ -157,7 +160,7 @@ class UsdOtio:
         # Check we have an Otio primitive
         #
         prim_type = usd_prim.GetTypeName()
-        if prim_type != 'Otio':
+        if prim_type != 'OtioTimeline':
             print(f'Invalid Otio primitive type. Is {prim_type}. ')
             exit(1)
 
@@ -168,7 +171,7 @@ class UsdOtio:
         #
         if os.path.isfile(self.otio_file):
             print(f'"{self.otio_file}" already exists.  Will overwrite it.')
-            self.continue_prompt()
+            Options.continue_prompt()
         
         #
         # Write out the json data
@@ -176,7 +179,7 @@ class UsdOtio:
         with open(self.otio_file, 'w') as f:
             f.write(json_data)
 
-        if self.verbose:
+        if Options.verbose:
             print('Extracted:\n\n', json_data)
         
     def run_otio_add(self):
@@ -207,6 +210,25 @@ class UsdOtio:
         # Create an USD otio primitive at path/otio.
         #
         usd_path = self.path
+        usd_prim = stage.GetPrimAtPath(usd_path)
+        if usd_prim: 
+            prim_type = usd_prim.GetTypeName()
+            if prim_type != 'OtioTimeline':
+                print(f'''USD path "{usd_path}" already has a primitive, 
+of type {prim_type}!
+
+Use -p <path> for passing the path to a new
+path or an already existing OtioTimeline primitive.
+
+Valid OtioTimeline primitives in stage:''')
+            found = False
+            for x in stage.Traverse():
+                if x.GetTypeName() == 'OtioTimeline':
+                    print(f'\t{x} is an OtioTimeline primitive.')
+                    found = True
+            if not found:
+                print('\tNone')
+            exit(1)
         
         usd_otio_item = Timeline(timeline)
         usd_otio_item.to_usd(stage, usd_path)
@@ -221,50 +243,54 @@ class UsdOtio:
             if timeline.stacks:
                 print("Retrieved the first stack:", first_stack)
                 stack = timeline.stacks[0]
-                usd_otio_item = Stack(stack)
+                usd_stack_item = Stack(stack)
             else:
-                usd_otio_item = Stack()
+                usd_stack_item = Stack()
         else:
-            usd_otio_item = Stack()
+            usd_stack_item = Stack()
             
-        usd_otio_item.to_usd(stage, stack_path)
-        if stack:
-            usd_otio_item.from_json_string(stack.to_json_string())
+        usd_stack_item.to_usd(stage, stack_path)
   
         
 
         track_index = 0
+        effect_index = 0
         for track in timeline.tracks:
-
+            
             track_path = stack_path + f'/track_{track_index}'
-            usd_otio_item = Track(track)
-            usd_otio_item.to_usd(stage, track_path)
-            usd_otio_item.from_json_string(track.to_json_string())
+            usd_track_item = Track(track)
+            usd_track_item.to_usd(stage, track_path)
+            usd_track_item.from_json_string(track.to_json_string())
+            
+            usd_stack_item.append_child(usd_track_item)
             
             track_index += 1
 
+            gap_index = 0
             clip_index = 0
             transition_index = 0
-            effect_index = 0
 
             for child in track:
 
                 usd_otio_item = None
                 usd_path = None
+                can_have_effects = False
 
                 if isinstance(child, otio.schema.Clip):
                     usd_path = track_path + f'/clip_{clip_index}'
                     usd_otio_item = Clip(child)
+                    can_have_effects = True
                     clip_index += 1
                     # Do something with the Clip
                 elif isinstance(child, otio.schema.Transition):
                     usd_path = track_path + f'/transition_{transition_index}'
                     usd_otio_item = Transition(child)
                     transition_index += 1
-                elif isinstance(child, otio.schema.Effect):
-                    usd_path = track_path + f'/effect_{effect_index}'
-                    usd_otio_item = Clip(child)
-                    effect_index += 1
+                elif isinstance(child, otio.schema.Gap):
+                    usd_path = track_path + f'/gap_{gap_index}'
+                    usd_otio_item = Gap(child)
+                    can_have_effects = True
+                    gap_index += 1
                 else:
                     print('Not creating anything!')
 
@@ -272,16 +298,31 @@ class UsdOtio:
                     usd_otio_item.to_usd(stage, usd_path)
                     usd_otio_item.from_json_string(child.to_json_string())
 
-            for effect in track.effects:
-                print(f'effect name: {effect.name}')
-                print(f'effect target: {effect.target}')
+                    if can_have_effects:
+                        for effect in child.effects:
+                            usd_path = usd_path + f'/effect_{effect_index}'
+                            usd_effect_item = Effect(effect)
+                            usd_effect_item.to_usd(stage, usd_path)
+                            usd_effect_item.from_json_string(effect.to_json_string())
+                            usd_otio_item.append_effect(usd_effect_item)
+                            
+                            effect_index += 1
+
+            if track.effects:
+                for effect in track.effects:
+                    usd_path = usd_path + f'/effect_{effect_index}'
+                    usd_otio_item = Effect(child)
+                    usd_effect_item.to_usd(stage, usd_path)
+                    usd_effect_item.from_json_string(effect.to_json_string())
+                
+                    effect_index += 1
         
         #
         # Export modified stage to output file
         #
         if self.output_file == self.usd_file:
             print('WARNING: Overwriting USD file.')
-            self.continue_prompt()
+            Options.continue_prompt()
         stage.Export(self.output_file)
 
     @staticmethod
@@ -385,9 +426,9 @@ class UsdOtio:
             print(parser.format_help())
             exit(1)
             
-        self.verbose = Base.verbose = args.verbose
-        self.usd_file  = args.usd_file
-        self.yes       = args.yes
+        Options.verbose = args.verbose
+        Options.yes = args.yes
+        self.usd_file = args.usd_file
 
         if self.mode != 'save':
             self.output_file = args.usd_output_file
@@ -399,7 +440,7 @@ class UsdOtio:
         if not self.output_file:
             self.output_file = self.usd_file
         
-        if self.verbose:
+        if Options.verbose:
             print('Verbose mode enabled!')
             print('\nEnvironment:\n')
             print(f'PXR_PLUGINPATH_NAME={os.environ["PXR_PLUGINPATH_NAME"]}')
@@ -446,24 +487,6 @@ class UsdOtio:
             elif self.mode == 'save':
                 print(f'\nGetting otio data from USD path "{self.path}"...\n')
                 print(f'Saving to "{self.otio_file}"')
-
-    def continue_prompt(self):
-        """
-        Prompt user to continue or cancel.
-        """
-        if self.yes:
-            print("\nShall I continue (y/n)? ")
-            print('y\n')
-            return
-        response = input("\nShall I continue (y/n)? ")
-        if response.lower() == 'y':
-            return
-        elif response.lower() == 'n':
-            print('Aborting...')
-            exit(1)
-        else:
-            print("Invalid input. Please enter 'y' or 'n'.")
-            self.continue_prompt()
 
 if __name__ == '__main__':
     usd_otio = UsdOtio()

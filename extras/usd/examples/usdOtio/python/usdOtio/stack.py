@@ -1,5 +1,6 @@
 
 import json
+
 from usdOtio.base import Base
 
 class Stack(Base):
@@ -15,14 +16,13 @@ class Stack(Base):
         # Remove children from jsonData
         self.jsonData.pop('children')
 
-    def to_json_string(self):
+    def from_usd(self):
         json_strings = [child.to_json_string() for child in self.children]
-        self.jsonData['children'] = json_strings
-        return json.dumps(self.jsonData)
+        self.jsonData['tracks'] = json_strings
+        return to_json_string()
 
     def to_usd(self, stage, usd_path):
         usd_prim = stage.DefinePrim(usd_path, 'OtioStack')
-        if self.verbose:
-            print(f'Created Stack at {usd_path}')
         self._store_json_string(usd_path, usd_prim)
+        self._report(usd_prim, usd_path)
         return usd_prim

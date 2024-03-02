@@ -20,56 +20,60 @@ over "GLOBAL" (
 
 # Note that it does not specify a typeName.
 class Otio "Otio" (
-    doc = """Defines a concrete OpenTimelineIO primitive root schema."""
+    doc = """Defines an abstract OpenTimelineIO primitive root schema."""
     inherits = </Typed>
 )  
 {
+	uniform string jsonData = "" (
+       	 doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioTimeline "OtioTimeline" (
     doc = """Defines a concrete OpenTimelineIO timeline schema."""
-    inherits = </Typed>
+    inherits = </Otio>
 )  
 {
-	uniform string jsonData = ""
 }
 
 class OtioStack "OtioStack" (
     doc = """Defines a concrete OpenTimelineIO stack schema."""
-    inherits = </Typed>
+    inherits = </Otio>
 )  
 {
-	uniform string jsonData = ""
 }
 
 class OtioTrack "OtioTrack" (
     doc = """Defines a concrete OpenTimelineIO track schema."""
-    inherits = </Typed>
+    inherits = </Otio>
 )  
 {
-	uniform string jsonData = ""
 }
 
 class OtioClip "OtioClip" (
     doc = """Defines a concrete OpenTimelineIO clip schema."""
-    inherits = </Typed>
+    inherits = </Otio>
 )  
 {
-	uniform string jsonData = ""
+}
+
+class OtioGap "OtioGap" (
+    doc = """Defines a concrete OpenTimelineIO clip schema."""
+    inherits = </Otio>
+)  
+{
 }
 
 class OtioTransition "OtioTransition" (
     doc = """Defines a concrete OpenTimelineIO transition schema."""
-    inherits = </Typed>
+    inherits = </Otio>
 )  
 {
-	uniform string jsonData = ""
 }
 
 class OtioEffect "OtioEffect" (
     doc = """Defines a concrete OpenTimelineIO effect schema."""
-    inherits = </Typed>
+    inherits = </Otio>
 )  
 {
-	uniform string jsonData = ""
 }
