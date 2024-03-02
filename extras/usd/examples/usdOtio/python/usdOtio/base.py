@@ -16,8 +16,9 @@ class Base:
     def to_json_string(self):
         return json.dumps(self.jsonData)
 
-    def from_usd(self):
-        pass
+    def from_usd(self, usd_prim):
+        self._extract_json_string(usd_prim)
+        return self.to_json_string()
     
     def to_usd(self, stage, usd_path):
         pass
@@ -36,6 +37,12 @@ class Base:
         # Attach the json data to the otio primitive
         #
         usd_prim.GetAttribute('jsonData').Set(self.to_json_string())
+
+    def _extract_json_string(self, usd_prim):
+        json_data = usd_prim.GetAttribute('jsonData').Get()
+        print(usd_prim)
+        self.jsonData = json.loads(json_data)
+        print("SELF     =",self.jsonData)
 
     def _report(self, usd_prim, usd_path):
         if Options.verbose:
