@@ -8,6 +8,17 @@ class Stack(Base):
     def __init__(self, otio_item = None):
         self.children = []
         super().__init__(otio_item)
+        if not otio_item:
+            self.jsonData = {
+                'OTIO_SCHEMA' : 'Stack.1',
+                'metadata' : {},
+                'name' : '',
+                'source_range' : None,
+                'effects' : [],
+                'markers' : [],
+                'enabled' : True,
+            }
+            
 
     def append_child(self, child):
         self.children.append(child)
@@ -38,11 +49,13 @@ class Stack(Base):
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
             if usd_type == 'OtioTrack':
-                usd_prim = Track()
-                usd_prim.from_usd(x)
-                self.children.append(usd_prim)
+                track_prim = Track()
+                track_prim.from_usd(x)
+                self.append_child(track_prim)
+            else:
+                print(f'WARNING: Unknown primitive {x}')
                 
-        json_strings = [json.loads(child.to_json_string()) for child in self.children]
+        json_strings = [json.loads(x.to_json_string()) for x in self.children]
         self.jsonData['children'] = json_strings
         return self.to_json_string()
 

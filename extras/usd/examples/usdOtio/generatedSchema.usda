@@ -7,55 +7,71 @@ class Otio "Otio" (
     doc = "Defines an abstract OpenTimelineIO primitive root schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioTimeline "OtioTimeline" (
     doc = "Defines a concrete OpenTimelineIO timeline schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioStack "OtioStack" (
     doc = "Defines a concrete OpenTimelineIO stack schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioTrack "OtioTrack" (
     doc = "Defines a concrete OpenTimelineIO track schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioClip "OtioClip" (
     doc = "Defines a concrete OpenTimelineIO clip schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioGap "OtioGap" (
     doc = "Defines a concrete OpenTimelineIO clip schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioTransition "OtioTransition" (
     doc = "Defines a concrete OpenTimelineIO transition schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 
 class OtioEffect "OtioEffect" (
     doc = "Defines a concrete OpenTimelineIO effect schema."
 )
 {
-    uniform string jsonData = ""
+    uniform string jsonData = "" (
+        doc = "JSON portion of an OpenTimelineIO schema."
+    )
 }
 

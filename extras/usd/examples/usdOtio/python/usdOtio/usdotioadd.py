@@ -115,21 +115,29 @@ Valid OtioTimeline primitives in stage:''')
   
         
 
-        track_index = 0
-        effect_index = 0
+        track_index = 1
+        video_track_index = 1
+        audio_track_index = 1
+        effect_index = 1
         for track in timeline.tracks:
-            
-            track_path = stack_path + f'/track_{track_index}'
+            if track.kind == 'Video':
+                track_path = stack_path + f'/Video_{video_track_index}'
+                video_track_index += 1
+            elif track.kind == 'Audio':
+                track_path = stack_path + f'/Audio_{audio_track_index}'
+                audio_track_index += 1
+            else:
+                track_path = stack_path + f'/Track_{track_index}'
+                track_index += 1
             usd_track_item = Track(track)
             usd_track_item.to_usd(stage, track_path)
             
             usd_stack_item.append_child(usd_track_item)
             
-            track_index += 1
 
-            gap_index = 0
-            clip_index = 0
-            transition_index = 0
+            gap_index = 1
+            clip_index = 1
+            transition_index = 1
 
             for child in track:
 
@@ -137,30 +145,45 @@ Valid OtioTimeline primitives in stage:''')
                 usd_path = None
                 can_have_effects = False
 
+                name = child.name
+                
                 if isinstance(child, otio.schema.Clip):
-                    usd_path = track_path + f'/clip_{clip_index}'
+                    if name:
+                        usd_path = track_path + f'/{name}_{clip_index}'
+                    else:
+                        usd_path = track_path + f'/Clip_{clip_index}'
                     usd_otio_item = Clip(child)
                     can_have_effects = True
                     clip_index += 1
                     # Do something with the Clip
                 elif isinstance(child, otio.schema.Transition):
-                    usd_path = track_path + f'/transition_{transition_index}'
+                    if name:
+                        usd_path = track_path + f'/{name}_{transition_index}'
+                    else:
+                        usd_path = track_path + f'/Transition_{transition_index}'
                     usd_otio_item = Transition(child)
                     transition_index += 1
                 elif isinstance(child, otio.schema.Gap):
-                    usd_path = track_path + f'/gap_{gap_index}'
+                    if name:
+                        usd_path = track_path + f'/{name}_{gap_index}'
+                    else:
+                        usd_path = track_path + f'/Gap_{gap_index}'
                     usd_otio_item = Gap(child)
                     can_have_effects = True
                     gap_index += 1
                 else:
-                    print('Not creating anything!')
+                    print('WARNING: Unknown child {child}')
 
                 if usd_otio_item:
                     usd_otio_item.to_usd(stage, usd_path)
 
                     if can_have_effects:
                         for effect in child.effects:
-                            usd_path = usd_path + f'/effect_{effect_index}'
+                            name = effect.name
+                            if name:
+                                usd_path = usd_path + f'/{name}_{effect_index}'
+                            else:
+                                usd_path = usd_path + f'/Effect_{effect_index}'
                             usd_effect_item = Effect(effect)
                             usd_effect_item.to_usd(stage, usd_path)
                             usd_effect_item.from_json_string(effect.to_json_string())

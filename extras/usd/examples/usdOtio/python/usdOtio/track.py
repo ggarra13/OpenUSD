@@ -51,10 +51,10 @@ class Track(Base):
                 usd_prim.from_usd(x)
                 self.effects.append(usd_prim)
                 
-        json_strings = [json.loads(child.to_json_string()) for child in self.children]
+        json_strings = [json.loads(x.to_json_string()) for x in self.children]
         self.jsonData['children'] = json_strings
         
-        json_strings = [json.loads(effect.to_json_string()) for effect in self.effects]
+        json_strings = [json.loads(x.to_json_string()) for x in self.effects]
         self.jsonData['effects'] = json_strings
         return self.to_json_string()
 

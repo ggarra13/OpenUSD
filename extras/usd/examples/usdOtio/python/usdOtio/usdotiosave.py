@@ -92,7 +92,11 @@ Valid OtioTimeline primitives in stage:''')
             if not found:
                 print('\tNone')
             exit(1)
-        
+
+        #
+        # Create a timeline and extract the .otio json data from this usd
+        # OtioTimeline primitive
+        #
         timeline = Timeline()
         json_data = timeline.from_usd(usd_prim)
 
