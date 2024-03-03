@@ -17,63 +17,165 @@ over "GLOBAL" (
 ) {
 }
 
-
-# Note that it does not specify a typeName.
-class Otio "Otio" (
+class OtioBase "OtioBase" (
     doc = """Defines an abstract OpenTimelineIO primitive root schema."""
     inherits = </Typed>
 )  
 {
-	uniform string jsonData = "" (
-       	 doc = "JSON portion of an OpenTimelineIO schema."
+	uniform string unknown = "" (
+       	 doc = "Unknown JSON data."
+    )
+	uniform string OTIO_SCHEMA = "" (
+	doc = "JSON schema"
+	)
+	uniform string metadata = "" (
+       	 doc = "User defined metadata."
     )
 }
 
+class OtioNamedBase "OtioNamedBase" (
+    doc = """Defines an abstract OpenTimelineIO primitive root schema."""
+    inherits = </OtioBase>
+)  
+{
+	uniform string name = "" (
+       	 doc = "User defined name."
+    )
+}
+
+class OtioRationalTime "OtioRationalTime" (
+    doc = """Defines a concrete OpenTimelineIO rational time schema."""
+    inherits = </OtioBase>
+)
+{
+	double value = 0.0 (
+	doc = "Numerator of rational time"
+	)
+	double rate = 24.0 (
+	doc = "Denominator of rational time"
+	)
+}
+
+class OtioTimeRange "OtioTimeRange" (
+    doc = """Defines a concrete OpenTimelineIO time range schema."""
+    inherits = </OtioBase>
+)
+{
+}
+
+
 class OtioTimeline "OtioTimeline" (
     doc = """Defines a concrete OpenTimelineIO timeline schema."""
-    inherits = </Otio>
+    inherits = </OtioNamedBase>
 )  
 {
 }
 
 class OtioStack "OtioStack" (
     doc = """Defines a concrete OpenTimelineIO stack schema."""
-    inherits = </Otio>
+    inherits = </OtioNamedBase>
 )  
 {
 }
 
 class OtioTrack "OtioTrack" (
     doc = """Defines a concrete OpenTimelineIO track schema."""
-    inherits = </Otio>
+    inherits = </OtioNamedBase>
 )  
 {
+	bool enabled = true (
+	doc = "Allows you to disable this track"
+	)
+	uniform string kind (
+	doc = "Type of track"
+	)
 }
 
 class OtioClip "OtioClip" (
     doc = """Defines a concrete OpenTimelineIO clip schema."""
-    inherits = </Otio>
+    inherits = </OtioNamedBase>
 )  
 {
+	bool enabled = true (
+	     doc = "Allows you to disable this clip"
+	)
+
+	uniform string active_media_reference_key (
+		doc = ""
+	)
 }
 
 class OtioGap "OtioGap" (
     doc = """Defines a concrete OpenTimelineIO clip schema."""
-    inherits = </Otio>
+    inherits = </OtioNamedBase>
 )  
 {
 }
 
 class OtioTransition "OtioTransition" (
     doc = """Defines a concrete OpenTimelineIO transition schema."""
-    inherits = </Otio>
+    inherits = </OtioNamedBase>
 )  
 {
+	uniform string transition_type = ""
 }
 
 class OtioEffect "OtioEffect" (
     doc = """Defines a concrete OpenTimelineIO effect schema."""
-    inherits = </Otio>
+    inherits = </OtioNamedBase>
 )  
 {
+}
+
+class OtioMissingReference "OtioMissingReference" (
+    doc = """Defines a concrete OpenTimelineIO media reference schema."""
+    inherits = </OtioNamedBase>
+)  
+{
+}
+
+class OtioExternalReference "OtioExternalReference" (
+    doc = """Defines a concrete OpenTimelineIO external reference schema."""
+    inherits = </OtioNamedBase>
+)  
+{
+	uniform string target_url = "" (
+	doc = "Url for the media"
+	)
+	
+	uniform string available_image_bounds (
+		doc = ""
+	)
+
+}
+
+class OtioImageSequenceReference "OtioImageSequenceReference" (
+    doc = """Defines a concrete OpenTimelineIO external reference schema."""
+    inherits = </OtioNamedBase>
+)  
+{
+	uniform string target_url_base = "" (
+	doc = "URL or Directory"
+	)
+	uniform string name_prefix = "" (
+	doc = "Base name"
+	)
+	uniform string name_suffix = "" (
+	doc = "Extension like .exr"
+	)
+	uniform int start_frame = 1 (
+	doc = "First frame of sequence"
+	)
+	uniform int frame_step = 1 (
+	doc = "Stepping"
+	)
+	uniform double rate = 24.0 (
+	doc = "Speed"
+	)
+	uniform int frame_zero_padding = 4 (
+	doc = "Number of padded zeros"
+	)
+	uniform string missing_frame_policy = "black" (
+	doc = ""
+	)
 }
