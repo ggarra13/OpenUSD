@@ -115,7 +115,7 @@ class OtioTrack "OtioTrack" (
     bool enabled = 1 (
         doc = "Allows you to disable this track"
     )
-    uniform string kind (
+    uniform string kind = "" (
         doc = "Type of track"
     )
     uniform string metadata = "" (
@@ -233,7 +233,7 @@ class OtioExternalReference "OtioExternalReference" (
     doc = "Defines a concrete OpenTimelineIO external reference schema."
 )
 {
-    uniform string available_image_bounds (
+    uniform string available_image_bounds = "" (
         doc = ""
     )
     uniform string metadata = "" (
