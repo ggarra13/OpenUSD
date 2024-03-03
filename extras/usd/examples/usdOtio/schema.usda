@@ -86,7 +86,7 @@ class OtioTrack "OtioTrack" (
 	bool enabled = true (
 	doc = "Allows you to disable this track"
 	)
-	uniform string kind (
+	uniform string kind = "" (
 	doc = "Type of track"
 	)
 }
@@ -143,7 +143,7 @@ class OtioExternalReference "OtioExternalReference" (
 	doc = "Url for the media"
 	)
 	
-	uniform string available_image_bounds (
+	uniform string available_image_bounds = "" (
 		doc = ""
 	)
 
