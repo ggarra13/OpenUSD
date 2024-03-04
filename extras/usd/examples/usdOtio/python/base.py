@@ -35,7 +35,7 @@ class Base:
     
     def create_usd(self, stage, usd_path, usd_type):
         usd_prim = stage.DefinePrim(usd_path, usd_type)
-        if Options.verbose == Verbose.INFO:
+        if Options.verbose >= Verbose.INFO:
             print(f'Created {usd_prim}')
         self._set_attributes(usd_prim)
         self._report(usd_prim, usd_path)
@@ -47,7 +47,7 @@ class Base:
         pass
     
     def _set_attribute(self, usd_prim, key, value):
-        if Options.verbose == Verbose.VERBOSE:
+        if Options.verbose >= Verbose.VERBOSE:
             print(f'\t\tSetting {key} = {value}')
         attr = usd_prim.GetAttribute(key)
         if isinstance(value, dict):
@@ -97,14 +97,14 @@ class Base:
             for key, val in unknown_dict.items():
                 if key == 'unknown':
                     continue
-                if Options.verbose == Verbose.DEBUG: 
+                if Options.verbose >= Verbose.DEBUG: 
                     print(f'\tGetting {key} = {val})')
                 self.jsonData[key] = val
 
         del self.jsonData['unknown']
          
     def _report(self, usd_prim, usd_path):
-        if Options.verbose == Verbose.INFO:
+        if Options.verbose >= Verbose.INFO:
             prim_type = usd_prim.GetTypeName()
             print(f'\tCreated {prim_type} at {usd_path}')
 

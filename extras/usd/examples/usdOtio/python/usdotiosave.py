@@ -36,10 +36,10 @@ Please run:
 from usdOtio.options import Options
 from usdOtio.clip import Clip
 from usdOtio.gap import Gap
+from usdOtio.options import Options, Verbose
 from usdOtio.stack import Stack
 from usdOtio.timeline import Timeline
 from usdOtio.transition import Transition
-from usdOtio.options import Options, Verbose
 from usdOtio.track import Track
 from usdOtio.effect import Effect
     
