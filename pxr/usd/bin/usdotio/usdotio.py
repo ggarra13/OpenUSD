@@ -84,7 +84,7 @@ Check PATH on Windows.
 #
 # usdOtio imports
 #
-from usdOtio.options import Options
+from usdOtio.options import Options, Verbose
 from usdOtio.usdotioadd import UsdOtioAdd
 from usdOtio.usdotiosave import UsdOtioSave
 
@@ -174,8 +174,23 @@ class UsdOtio:
         if usd.endswith('.usd') or usd.endswith('.usda') or \
            usd.endswith('.usdz') or usd.endswith('.usdc'):
             return
-        print(f'Invalid extension for USD file: {usd}')
+        print(f'ERROR: Invalid extension for USD file: {usd}',
+              file=sys.stderr)
         exit(1)
+        
+    @staticmethod
+    def parse_verbosity(value):
+        """
+        Parses the verbosity level argument, handling both enum names and integers.
+        """
+        try:
+            return Verbose[value.upper()]  # Try converting to enum member by name
+        except KeyError:
+            try:
+                return int(value)  # Fallback to integer conversion
+            except ValueError:
+                raise argparse.ArgumentTypeError(f"Invalid verbosity level: {value}")
+
         
     def parse_arguments(self):
         """
@@ -199,8 +214,10 @@ class UsdOtio:
         # 'add' parser
         #
         add_parser = subparsers.add_parser('add', help='Add mode')
-        add_parser.add_argument('-v', '--verbose', action='store_true',
-                                help='Enable verbose mode.')
+        add_parser.add_argument('-v', '--log', nargs='?',
+                                default=Verbose.QUIET, dest='verbose',
+                                type=self.parse_verbosity,
+                                help="Set verbosity level (debug, verbose, normal, quiet or integer value)")
         add_parser.add_argument('-y', '--yes', action='store_true',
                                 help='Answer yes to all questions')
         add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -221,8 +238,10 @@ class UsdOtio:
         # 'save' parser
         #
         save_parser = subparsers.add_parser('save', help='Save mode')
-        save_parser.add_argument('-v', '--verbose', action='store_true',
-                                 help='Enable verbose mode.')
+        save_parser.add_argument('-v', '--log', nargs='?',
+                                 default=Verbose.QUIET, dest='verbose',
+                                 type=self.parse_verbosity,
+                                 help="Set verbosity level (debug, verbose, normal, quiet or integer value)")
         save_parser.add_argument('-y', '--yes', action='store_true',
                                  help='Answer yes to all questions')
         save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -239,8 +258,10 @@ class UsdOtio:
         # 'v2' parser
         #
         v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
-        v2_parser.add_argument('-v', '--verbose', action='store_true',
-                               help='Enable verbose mode.')
+        v2_parser.add_argument('-v', '--log', nargs='?',
+                               default=Verbose.QUIET, dest='verbose',
+                               type=self.parse_verbosity,
+                               help="Set verbosity level (debug, verbose, normal, quiet or integer value)")
         v2_parser.add_argument('-y', '--yes', action='store_true',
                                help='Answer yes to all questions')
         v2_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -278,12 +299,14 @@ class UsdOtio:
         if not self.output_file:
             self.output_file = self.usd_file
         
-        if Options.verbose:
+        if Options.verbose == Verbose.DEBUG:
             print('Verbose mode enabled!')
             print('\nEnvironment:\n')
             print(f'PXR_PLUGINPATH_NAME={os.environ["PXR_PLUGINPATH_NAME"]}')
             print('')
             print(f'sys.path={os.path.pathsep.join(sys.path)}')
+            
+        if Options.verbose >= Verbose.INFO.value:
             print('')
             print(f'Selected mode: {self.mode}')
             print('')
@@ -293,15 +316,16 @@ class UsdOtio:
         #
         if self.otio_file:
             if self.otio_file.endswith('.otioz'):
-                print(f'.otioz files currently are not supported.  Sorry!')
+                print(f'.otioz files currently are not supported.  Sorry!',
+                      file=sys.stderr)
                 exit(1)
 
         self.valid_usd(self.usd_file)
         if not os.path.exists(self.usd_file):
-            print(f'"{self.usd_file}" does not exist!')
+            print(f'"{self.usd_file}" does not exist!', file=sys.stderr)
             exit(1)
         if not os.path.isfile(self.usd_file):
-            print(f'"{self.usd_file}" is not a file!')
+            print(f'"{self.usd_file}" is not a file!', file=sys.stderr)
             exit(1)
             
         if self.output_file:
@@ -317,14 +341,17 @@ class UsdOtio:
             self.path = '/otio'
                 
             if self.mode == "add":
-                print(f'\nAdding "{self.otio_file}" to\n'
-                      f'USD path "{self.path}" in\n'
-                      f'"{self.usd_file}"...\n')
+                if Options.verbose >= Verbose.INFO.value:
+                    print(f'\nAdding "{self.otio_file}" to\n'
+                          f'USD path "{self.path}" in\n'
+                          f'"{self.usd_file}"...')
             if self.output_file != self.usd_file:
-                print(f'\nSaving to {self.output_file}')
+                if Options.verbose >= Verbose.INFO.value:
+                    print(f'\nSaving to {self.output_file}')
             elif self.mode == 'save':
-                print(f'\nGetting otio data from USD path "{self.path}"...\n')
-                print(f'Saving to "{self.otio_file}"')
+                if Options.verbose >= Verbose.INFO.value:
+                    print(f'\nGetting otio data from USD path "{self.path}"...\n')
+                    print(f'Saving to "{self.otio_file}"')
 
 if __name__ == '__main__':
     usd_otio = UsdOtio()

@@ -28,9 +28,6 @@ class OtioBase "OtioBase" (
 	uniform string OTIO_SCHEMA = "" (
 	doc = "JSON schema"
 	)
-	uniform string metadata = "" (
-       	 doc = "User defined metadata."
-    )
 }
 
 class OtioNamedBase "OtioNamedBase" (
@@ -41,6 +38,9 @@ class OtioNamedBase "OtioNamedBase" (
 	uniform string name = "" (
        	 doc = "User defined name."
     )
+	uniform string metadata = "" (
+       	 doc = "User defined metadata."
+	 )
 }
 
 class OtioRationalTime "OtioRationalTime" (
@@ -76,6 +76,9 @@ class OtioStack "OtioStack" (
     inherits = </OtioNamedBase>
 )  
 {
+	bool enabled = true (
+	     doc = "Allows you to disable this stack"
+	)
 }
 
 class OtioTrack "OtioTrack" (
@@ -110,6 +113,9 @@ class OtioGap "OtioGap" (
     inherits = </OtioNamedBase>
 )  
 {
+	bool enabled = true (
+	     doc = "Allows you to disable this gap"
+	)
 }
 
 class OtioTransition "OtioTransition" (
@@ -125,7 +131,21 @@ class OtioEffect "OtioEffect" (
     inherits = </OtioNamedBase>
 )  
 {
+      uniform string effect_name = "" (
+      	      doc = "Name of the effect"
+      )
 }
+
+class OtioLinearTimeWarp "OtioLinearTimeWarp" (
+    doc = """Defines a concrete OpenTimelineIO linear time warp schema."""
+    inherits = </OtioEffect>
+)  
+{
+	double time_scalar = 1.0 (
+		doc = "Scale the item by this amount."
+	)
+}
+
 
 class OtioMissingReference "OtioMissingReference" (
     doc = """Defines a concrete OpenTimelineIO media reference schema."""
@@ -141,10 +161,6 @@ class OtioExternalReference "OtioExternalReference" (
 {
 	uniform string target_url = "" (
 	doc = "Url for the media"
-	)
-	
-	uniform string available_image_bounds = "" (
-		doc = ""
 	)
 
 }
@@ -178,4 +194,35 @@ class OtioImageSequenceReference "OtioImageSequenceReference" (
 	uniform string missing_frame_policy = "black" (
 	doc = ""
 	)
+}
+
+class OtioMarker "OtioMarker" (
+    doc = """Defines a concrete OpenTimelineIO marker schema."""
+    inherits = </OtioNamedBase>
+)  
+{
+	uniform string color = "green" (
+	doc = "Color of the marker"
+	)
+}
+
+class OtioV2d "OtioV2d" (
+    doc = """Defines a concrete OpenTimelineIO 2D vector schema."""
+    inherits = </Typed>
+)  
+{
+	float x (
+	doc = "x of vector"
+	)
+	
+	float y (
+	doc = "y of vector"
+	)
+}
+
+class OtioBox2d "OtioBox2d" (
+    doc = """Defines a concrete OpenTimelineIO box schema."""
+    inherits = </Typed>
+)  
+{
 }
