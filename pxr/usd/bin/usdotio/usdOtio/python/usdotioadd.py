@@ -127,7 +127,7 @@ Valid OtioTimeline primitives in stage:''')
         stack = None
         stack_path = usd_path + '/Stack'
         
-        stack = self.get_first_stack(timeline)
+        stack = timeline.tracks
         if stack:
             usd_stack_item = Stack(stack)
         else:

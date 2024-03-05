@@ -34,8 +34,7 @@ pxr_register_test(testUsdOtioAdd1
     COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio add -o out.usda -n a.otio a.usda"
     DIFF_COMPARE out.usda
     EXPECTED_RETURN_CODE 0
-    PRE_PATH
-        ${CMAKE_INSTALL_PREFIX}/bin
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 pxr_install_test_dir(
@@ -48,8 +47,7 @@ pxr_register_test(testUsdOtioAdd2
     COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio add -o out.usda -n a.otio a.usda"
     DIFF_COMPARE out.usda
     EXPECTED_RETURN_CODE 0
-    PRE_PATH
-        ${CMAKE_INSTALL_PREFIX}/bin
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 pxr_install_test_dir(
@@ -62,8 +60,20 @@ pxr_register_test(testUsdOtioAdd3
     COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio add -o out.usda -n a.otio a.usda"
     DIFF_COMPARE out.usda
     EXPECTED_RETURN_CODE 0
-    PRE_PATH
-        ${CMAKE_INSTALL_PREFIX}/bin
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
+)
+
+pxr_install_test_dir(
+    SRC testenv/testUsdOtioAdd4
+    DEST testUsdOtioAdd4
+)
+
+pxr_register_test(testUsdOtioAdd4
+    PYTHON
+    COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio add -o out.usda -n a.otio a.usda"
+    DIFF_COMPARE out.usda
+    EXPECTED_RETURN_CODE 0
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 pxr_install_test_dir(
@@ -76,8 +86,7 @@ pxr_register_test(testUsdOtioSave1
     COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio save out.otio a.usda"
     DIFF_COMPARE out.otio
     EXPECTED_RETURN_CODE 0
-    PRE_PATH
-        ${CMAKE_INSTALL_PREFIX}/bin
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 pxr_install_test_dir(
@@ -90,8 +99,7 @@ pxr_register_test(testUsdOtioSave2
     COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio save out.otio a.usda"
     DIFF_COMPARE out.otio
     EXPECTED_RETURN_CODE 0
-    PRE_PATH
-        ${CMAKE_INSTALL_PREFIX}/bin
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 pxr_install_test_dir(
@@ -104,6 +112,18 @@ pxr_register_test(testUsdOtioSave3
     COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio save out.otio a.usda"
     DIFF_COMPARE out.otio
     EXPECTED_RETURN_CODE 0
-    PRE_PATH
-        ${CMAKE_INSTALL_PREFIX}/bin
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
+)
+
+pxr_install_test_dir(
+    SRC testenv/testUsdOtioSave4
+    DEST testUsdOtioSave4
+)
+
+pxr_register_test(testUsdOtioSave4
+    PYTHON
+    COMMAND "${CMAKE_INSTALL_PREFIX}/bin/usdotio save out.otio a.usda"
+    DIFF_COMPARE out.otio
+    EXPECTED_RETURN_CODE 0
+    PRE_PATH ${CMAKE_INSTALL_PREFIX}/bin
 )

@@ -202,13 +202,17 @@ class UsdOtio:
         Parse the command-line's arguments
         """
     
-        description="""
-        A program to embed and extract an .otio file from a .usd file and to
-        convert Omniverse's sequencer to an .usd file with embedded .otio
-        data.
-        """
+        description=f"""
+       usdotio v{VERSION}
+
+       A program to embed and extract an .otio file from a .usd file.
+
+       It can also convert Omniverse's sequencer to an .usd file with 
+       embedded .otio data."""
             
-        parser = argparse.ArgumentParser(description=description)
+        parser = argparse.ArgumentParser(
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=description)
         subparsers = parser.add_subparsers(dest='mode',
                                            help='Mode of operation')
         
@@ -222,9 +226,9 @@ class UsdOtio:
         add_parser.add_argument('-v', '--log', nargs='?',
                                 default=Verbose.QUIET, dest='verbose',
                                 type=self.parse_verbosity,
-                                help='Set verbosity level:\n' \
-                                '\tdebug\n\tverbose\n\tnormal\n\tquiet\n\n\t' \
-                                'or integer value)')
+                                help='Set verbosity level: ' \
+                                'debug verbose info normal quiet ' \
+                                'or integer value')
         add_parser.add_argument('-y', '--yes', action='store_true',
                                 help='Answer yes to all questions')
         add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -251,9 +255,9 @@ class UsdOtio:
         save_parser.add_argument('-v', '--log', nargs='?',
                                  default=Verbose.QUIET, dest='verbose',
                                  type=self.parse_verbosity,
-                                 help='Set verbosity level:\n' \
-                                 '\tdebug\n\tverbose\n\tnormal\n\tquiet\n\n\t' \
-                                 'or integer value)')
+                                 help='Set verbosity level: ' \
+                                 'debug verbose info normal quiet ' \
+                                 'or integer value')
         save_parser.add_argument('-y', '--yes', action='store_true',
                                  help='Answer yes to all questions')
         save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -276,9 +280,9 @@ class UsdOtio:
         v2_parser.add_argument('-v', '--log', nargs='?',
                                default=Verbose.QUIET, dest='verbose',
                                type=self.parse_verbosity,
-                               help='Set verbosity level:\n' \
-                               '\tdebug\n\tverbose\n\tnormal\n\tquiet\n\n\t' \
-                               'or integer value)')
+                                 help='Set verbosity level: ' \
+                                 'debug verbose info normal quiet ' \
+                                 'or integer value')
         v2_parser.add_argument('-y', '--yes', action='store_true',
                                help='Answer yes to all questions')
         v2_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -324,7 +328,8 @@ class UsdOtio:
             print('')
             print(f'sys.path={os.path.pathsep.join(sys.path)}')
             
-        if Options.verbose >= Verbose.INFO.value:
+        if Options.verbose >= Verbose.NORMAL.value:
+            print(f'usdotio v{VERSION}')
             print('')
             print(f'Selected mode: {self.mode}')
             print('')
@@ -372,8 +377,6 @@ class UsdOtio:
                     print(f'Saving to "{self.otio_file}"')
 
 if __name__ == '__main__':
-    if Options.verbose >= Verbose.INFO.value:
-        print(f'usdotio v{VERSION}')
     usd_otio = UsdOtio()
     exit(0)
     

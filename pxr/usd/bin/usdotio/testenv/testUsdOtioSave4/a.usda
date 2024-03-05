@@ -23,8 +23,8 @@ def OtioTimeline "otio"
     def OtioStack "Stack"
     {
         bool enabled = 1
-        uniform string metadata = "{}"
-        uniform string name = "tracks"
+        uniform string metadata = '"{}"'
+        uniform string name = "Stack"
         uniform string OTIO_SCHEMA = "Stack.1"
 
         def OtioTrack "Video_1"
