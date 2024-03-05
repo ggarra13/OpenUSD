@@ -2,9 +2,10 @@
 import json
 
 from usdOtio.named_base import NamedBase
-from usdOtio.time_range import TimeRange
+from usdOtio.time_range_mixin import TimeRangeMixin
 
-class MediaReference(NamedBase):
+
+class MediaReference(NamedBase, TimeRangeMixin):
 
     FILTER_KEYS = [
         'available_image_bounds',
@@ -29,13 +30,12 @@ class MediaReference(NamedBase):
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
             usd_name = x.GetName()
-            if usd_type == 'OtioTimeRange':  
-                range_prim = TimeRange()
-                self.jsonData[usd_name] = range_prim.from_usd(x)
+            if usd_type == 'OtioTimeRange':
+                self.jsonData[usd_name] = self._create_time_range(x)
             else:
                 print(f'WARNING: (media_reference.py) Unknown node {usd_type} attached to {usd_prim}!')
                 continue
         
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(MediaReference.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(MediaReference.FILTER_KEYS)

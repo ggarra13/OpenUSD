@@ -2,37 +2,34 @@
 import json
 
 from usdOtio.base import Base
-from usdOtio.rational_time import RationalTime
+from usdOtio.rational_time_mixin import RationalTimeMixin
 
-class TimeRange(Base):
+class TimeRange(Base, RationalTimeMixin):
 
     FILTER_KEYS = [
         'start_time',
-        'duration',
+        'duration'
     ]
     
     def __init__(self, jsonData = {}):
         self.jsonData = jsonData.copy() # must copy the json data!
         self.otio_item  = None
-        self.start_time = None
-        self.duration   = None
 
     def to_json_string(self):
         return self.jsonData
 
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(TimeRange.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(TimeRange.FILTER_KEYS)
         
     def from_usd(self, usd_prim):
         super().from_usd(usd_prim)
         
-        for x in usd_prim.GetChildren():
-            usd_name = x.GetName()
-            usd_type = x.GetTypeName()
+        for child_prim in usd_prim.GetChildren():
+            usd_name = child_prim.GetName()
+            usd_type = child_prim.GetTypeName()
             if usd_type == 'OtioRationalTime':
-                time = RationalTime()
-                self.jsonData[usd_name] = time.from_usd(x)
+                self.jsonData[usd_name] = self._create_rational_time(child_prim)
             else:
                 print(f'WARNING: (time_range.py) Unknown node {usd_type} for '
                       f'{usd_prim}')
@@ -40,19 +37,10 @@ class TimeRange(Base):
         return self.jsonData
     
     def to_usd(self, stage, usd_path):
-        usd_prim = stage.DefinePrim(usd_path, 'OtioTimeRange')
+        self._set_rational_time(stage, usd_path, 'start_time')
+        self._set_rational_time(stage, usd_path, 'duration')
         
-        start_time = RationalTime(self.jsonData['start_time'])
-        start_path = usd_path + '/start_time'
-        start_prim = start_time.to_usd(stage, start_path)
+        usd_prim = self._create_usd(stage, usd_path, 'OtioTimeRange')
         
-        duration = RationalTime(self.jsonData['duration'])
-        duration_path = usd_path + '/duration'
-        duration_prim = duration.to_usd(stage, duration_path)
         
-        self._set_attributes(usd_prim)
         return usd_prim
-
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(TimeRange.FILTER_KEYS)

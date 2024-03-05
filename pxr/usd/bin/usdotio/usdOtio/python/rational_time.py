@@ -4,11 +4,6 @@ import json
 from usdOtio.base import Base
 
 class RationalTime(Base):
-
-    FILTER_KEYS = [
-        'value',
-        'rate',
-    ]
     
     def __init__(self, json_data = None):
         if json_data:
@@ -18,18 +13,13 @@ class RationalTime(Base):
                 'value' : 0,
                 'rate'  : 24
             }
-    
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(RationalTime.FILTER_KEYS)
         
     def from_usd(self, usd_prim):
-        super().from_usd(usd_prim)
+        self._get_attributes(usd_prim)
         return self.jsonData
     
     def to_usd(self, stage, usd_path):
-        usd_prim = stage.DefinePrim(usd_path, 'OtioRationalTime')
-        self._set_attributes(usd_prim)
+        usd_prim = super()._create_usd(stage, usd_path, 'OtioRationalTime')
         return usd_prim
     
     def _set_attributes(self, usd_prim):   

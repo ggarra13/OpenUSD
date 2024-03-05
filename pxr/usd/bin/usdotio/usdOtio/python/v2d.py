@@ -19,9 +19,9 @@ class V2d(Base):
                 'y' : 0
             }
     
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(RationalTime.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(RationalTime.FILTER_KEYS)
         
     def from_usd(self, usd_prim):
         super().from_usd(usd_prim)

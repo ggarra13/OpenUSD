@@ -62,21 +62,88 @@ class UsdOtioAdd:
             usd_effect_item = Effect(effect)
             
         usd_effect_item.to_usd(stage, usd_path)
-        
-    @staticmethod
-    def get_first_stack(timeline):
-        return None
 
     def parse_effects(self, stage, usd_path, effects):
         for effect in effects:
             self.create_effect(stage, usd_path, effect)
             self.effect_index += 1
-    
+
+    def process_child(self, stage, track_path, child):
+        usd_child_item = None
+        usd_path = None
+        can_have_effects = False
+                
+        if isinstance(child, otio.schema.Clip):
+            usd_path = track_path + f'/Clip_{self.clip_index}'
+            usd_child_item = Clip(child)
+            can_have_effects = True
+            self.clip_index += 1
+        elif isinstance(child, otio.schema.Transition):
+            usd_path = track_path + f'/Transition_{self.transition_index}'
+            usd_child_item = Transition(child)
+            self.transition_index += 1
+        elif isinstance(child, otio.schema.Gap):
+            usd_path = track_path + f'/Gap_{self.gap_index}'
+            usd_child_item = Gap(child)
+            can_have_effects = True
+            self.gap_index += 1
+        elif isinstance(child, otio.schema.Stack):
+            usd_path = track_path + f'/Stack_{self.stack_index}'
+            usd_child_item = Stack(child)
+            can_have_effects = True
+            self.stack_index += 1
+            self.recurse_stack(stage, usd_path, child)
+        else:
+            print('WARNING: Unknown child {child}')
+                
+        if usd_child_item:
+            usd_child_item.to_usd(stage, usd_path)
+
+            if can_have_effects:
+                self.parse_effects(stage, usd_path, child.effects)
+                    
+    def recurse_track(self, stage, track_path, track):
+        for track in track:
+            self.process_child(stage, track_path, track)
+
+            if track.effects:
+                self.parse_effects(stage, track_path, track.effects)
+
+    def recurse_stack(self, stage, stack_path, stack):
+        
+        for child in stack:
+            if isinstance(child, otio.schema.Track):
+                if child.kind == 'Video':
+                    track_path = stack_path + f'/Video_{self.video_track_index}'
+                    self.video_track_index += 1
+                elif child.kind == 'Audio':
+                    track_path = stack_path + f'/Audio_{self.audio_track_index}'
+                    self.audio_track_index += 1
+                else:
+                    if Options.verbose >= Verbose.WARNING:
+                        print(f'Unknown track type {child}!')
+                    continue
+                track_item = Track(child)
+                track_item.to_usd(stage, track_path)
+                self.recurse_track(stage, track_path, child)
+            else:
+                self.process_child(stage, stack_path, child)
+            
     def run(self):
         """
         Run the otio add algorithm.
         """
-
+        #
+        # Initialize some counters
+        #
+        self.track_index = 1
+        self.video_track_index = 1
+        self.audio_track_index = 1
+        self.gap_index = 1
+        self.clip_index = 1
+        self.stack_index = 1
+        self.transition_index = 1
+        
         #
         # Open the original scene file
         # 
@@ -132,72 +199,10 @@ Valid OtioTimeline primitives in stage:''')
             usd_stack_item = Stack(stack)
         else:
             usd_stack_item = Stack(otio.schema.Stack())
-            
         usd_stack_item.to_usd(stage, stack_path)
-            
-  
-        
 
-        track_index = 1
-        video_track_index = 1
-        audio_track_index = 1
         self.effect_index = 1
-        for track in timeline.tracks:
-            if track.kind == 'Video':
-                track_path = stack_path + f'/Video_{video_track_index}'
-                video_track_index += 1
-            elif track.kind == 'Audio':
-                track_path = stack_path + f'/Audio_{audio_track_index}'
-                audio_track_index += 1
-            else:
-                track_path = stack_path + f'/Track_{track_index}'
-                track_index += 1
-            usd_track_item = Track(track)
-            usd_track_item.to_usd(stage, track_path)
-            
-            usd_stack_item.append_child(usd_track_item)
-        
-            gap_index = 1
-            clip_index = 1
-            stack_index = 1
-            transition_index = 1
-
-            for child in track:
-
-                usd_child_item = None
-                usd_path = None
-                can_have_effects = False
-                
-                if isinstance(child, otio.schema.Clip):
-                    usd_path = track_path + f'/Clip_{clip_index}'
-                    usd_child_item = Clip(child)
-                    can_have_effects = True
-                    clip_index += 1
-                elif isinstance(child, otio.schema.Transition):
-                    usd_path = track_path + f'/Transition_{transition_index}'
-                    usd_child_item = Transition(child)
-                    transition_index += 1
-                elif isinstance(child, otio.schema.Gap):
-                    usd_path = track_path + f'/Gap_{gap_index}'
-                    usd_child_item = Gap(child)
-                    can_have_effects = True
-                    gap_index += 1
-                elif isinstance(child, otio.schema.Stack):
-                    usd_path = track_path + f'/Stack_{stack_index}'
-                    usd_child_item = Stack(child)
-                    can_have_effects = True
-                    stack_index += 1
-                else:
-                    print('WARNING: Unknown child {child}')
-
-                if usd_child_item:
-                    usd_child_item.to_usd(stage, usd_path)
-
-                    if can_have_effects:
-                        self.parse_effects(stage, usd_path, child.effects)
-
-            if track.effects:
-                self.parse_effects(stage, usd_path, track.effects)
+        self.recurse_stack(stage, stack_path, stack)
         
         #
         # Export modified stage to output file

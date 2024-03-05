@@ -6,9 +6,9 @@ from usdOtio.effect import Effect
 from usdOtio.linear_time_warp import LinearTimeWarp
 from usdOtio.marker import Marker
 from usdOtio.named_base import NamedBase
-from usdOtio.time_range import TimeRange
+from usdOtio.time_range_mixin import TimeRangeMixin
 
-class Item(NamedBase):
+class Item(NamedBase, TimeRangeMixin):
 
     FILTER_KEYS = [
         'effects',
@@ -28,9 +28,9 @@ class Item(NamedBase):
     def append_marker(self, marker):
         self.markers.append(marker)
 
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(Item.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(Item.FILTER_KEYS)
         
     def from_json_string(self, s):
         self.jsonData = json.loads(s)
@@ -45,8 +45,7 @@ class Item(NamedBase):
             usd_type = x.GetTypeName()
             usd_name = x.GetName()
             if usd_type == 'OtioTimeRange':
-                range_prim = TimeRange()
-                self.jsonData[usd_name] = range_prim.from_usd(x)
+                self.jsonData[usd_name] = self._create_time_range(x)
             elif usd_type == 'OtioLinearTimeWarp':
                 tw_prim = LinearTimeWarp()
                 tw_prim.from_usd(x)

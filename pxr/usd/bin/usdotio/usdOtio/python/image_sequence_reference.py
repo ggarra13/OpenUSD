@@ -14,13 +14,13 @@ class ImageSequenceReference(MediaReference):
     
     def to_usd(self, stage, usd_path):
         super().to_usd(stage, usd_path)
-        usd_prim = self.create_usd(stage, usd_path,
+        usd_prim = self._create_usd(stage, usd_path,
                                    'OtioImageSequenceReference')
         return usd_prim
 
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(ImageSequenceReference.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(ImageSequenceReference.FILTER_KEYS)
 
     def _set_attributes(self, usd_prim):
         

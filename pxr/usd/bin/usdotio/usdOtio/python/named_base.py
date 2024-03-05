@@ -1,13 +1,12 @@
 
 import json
 
-from usdOtio.base    import Base
-from usdOtio.options import Options, Verbose
-from usdOtio.time_range import TimeRange
+from usdOtio.base       import Base
+from usdOtio.options    import Options, Verbose
 
 class NamedBase(Base):
 
-    ATTRIBUTES = [
+    FILTER_KEYS = [
         'metadata',
     ]
     
@@ -22,9 +21,9 @@ class NamedBase(Base):
     def from_usd(self, usd_prim):
         return super().from_usd(usd_prim)
     
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(NamedBase.ATTRIBUTES)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(NamedBase.FILTER_KEYS)
 
     def _set_attributes(self, usd_prim):
         self._set_attribute(usd_prim, 'metadata', self.metadata)
@@ -44,15 +43,3 @@ class NamedBase(Base):
                 print(f"Error decoding JSON: {e}")
         else:
             self.jsonData['metadata'] = {}
-
-    def _set_time_range(self, stage, usd_path, name):
-        s = self.jsonData.get(name)
-        range_prim = None
-        if s:
-            range_path = usd_path + f'/{name}'
-            range_prim = TimeRange(s)
-            range_prim.to_usd(stage, range_path)
-            if Options.verbose == Verbose.DEBUG:
-                print(f'\t\tCreated time range at {range_path}')
-
-        return range_prim

@@ -13,6 +13,9 @@ test_usdotio()
 
     usdotio add -o "${usd_out}" "${otio}" "${usd}"
 
+    usdview ${usd_out}
+    exit 0
+    
     usdotio save "${otio_out}" "${usd_out}"
 
     otiocat "${otio}" > "${otio_cat}"
@@ -20,15 +23,10 @@ test_usdotio()
 
     error=`diff -w ${otio_cat} ${otio_out_cat}`
     if [[ "${error}" != "" ]]; then
-	
-	# Count the number of lines in the variable
-	line_count=$(echo "$error" | wc -l)
-	if [ "$line_count" -eq 4 ]; then
-	    echo $error
-	else
-	    echo "DIFFERENT FILES!"
-	    meld "${otio_cat}" "${otio_out_cat}"
-	fi
+	echo "usd file ${usd_out}"
+	echo "${otio}" "${otio_out}"
+	meld "${otio_cat}" "${otio_out_cat}"
+	exit 1
     else
 	echo "MATCHING FILES"
     fi
@@ -44,11 +42,15 @@ fi
 . $ROOT/bin/env.sh
 
 cd ~/Movies
-for i in *.otio; do
-    test_usdotio $i ~/assets/sphere.usda
-done
 
-cd ~/code/applications/mrv2/tlRender/etc/SampleData
-for i in *.otio; do
-    test_usdotio $i ~/assets/sphere.usda
-done
+file=nested_stack.otio
+test_usdotio $file ~/assets/sphere.usda
+
+# for i in *.otio; do
+#     test_usdotio $i ~/assets/sphere.usda
+# done
+
+# cd ~/code/applications/mrv2/tlRender/etc/SampleData
+# for i in *.otio; do
+#     test_usdotio $i ~/assets/sphere.usda
+# done

@@ -17,9 +17,9 @@ class Box2d(Base):
     def to_json_string(self):
         return self.jsonData
 
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(Box2D.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(Box2D.FILTER_KEYS)
         
     def from_usd(self, usd_prim):
         for x in usd_prim.GetChildren():
@@ -47,6 +47,6 @@ class Box2d(Base):
         
         return usd_prim
 
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(Box2d.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(Box2d.FILTER_KEYS)

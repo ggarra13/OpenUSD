@@ -13,7 +13,6 @@ from usdOtio.options import Options, Verbose
 class Clip(Item):
 
     FILTER_KEYS = [
-        'enabled',
         'media_references',
     ]
     
@@ -67,7 +66,7 @@ class Clip(Item):
     def to_usd(self, stage, usd_path): 
         super().to_usd(stage, usd_path)
         
-        usd_prim = self.create_usd(stage, usd_path, 'OtioClip')
+        usd_prim = self._create_usd(stage, usd_path, 'OtioClip')
         
         m = self.otio_item.media_reference
         if m:
@@ -91,13 +90,6 @@ class Clip(Item):
         return usd_prim
 
 
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(Clip.FILTER_KEYS)
-
-    def _set_attributes(self, usd_prim):
-        self._set_attribute(usd_prim, 'enabled', self.enabled)
-        self._set_attribute(usd_prim, 'active_media_reference_key',
-                            self.jsonData['active_media_reference_key'])
-        
-        super()._set_attributes(usd_prim)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(Clip.FILTER_KEYS)

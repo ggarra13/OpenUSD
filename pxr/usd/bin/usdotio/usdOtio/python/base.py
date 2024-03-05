@@ -3,16 +3,10 @@ import json
 
 import pxr
 
-import opentimelineio as otio
-
 from usdOtio.options import Options, Verbose
 
 class Base:
 
-    ATTRIBUTES = [
-        'OTIO_SCHEMA',
-        ]
-    
     def __init__(self, otio_item = None):
         self.jsonData = {}
         self.otio_item = otio_item
@@ -33,17 +27,7 @@ class Base:
     def to_usd(self, stage, usd_path):
         pass
     
-    def create_usd(self, stage, usd_path, usd_type):
-        usd_prim = stage.DefinePrim(usd_path, usd_type)
-        if Options.verbose >= Verbose.INFO:
-            print(f'Created {usd_prim}')
-        self._set_attributes(usd_prim)
-        self._report(usd_prim, usd_path)
-        return usd_prim
-
-    
-    
-    def filter_keys(self):
+    def _filter_keys(self):
         pass
     
     def _set_attribute(self, usd_prim, key, value):
@@ -59,11 +43,12 @@ class Base:
             attr.Set(value)
         except pxr.Tf.ErrorException:
             usd_type = usd_prim.GetTypeName()
-            print(f'WARNING: Unknown attribute {key} for {usd_type} at')
-            print(f'{usd_prim}')
-            print(f'Valid Properties:')
-            for i in usd_prim.GetPropertyNames():
-                print(f'\t{i}')
+            if Options.verbose >= Verbose.VERBOSE:
+                print(f'WARNING: Unknown attribute {key} for {usd_type} at')
+                print(f'{usd_prim}')
+                print(f'Valid Properties:')
+                for i in usd_prim.GetPropertyNames():
+                    print(f'\t{i}')
             unknown = usd_prim.GetAttribute('unknown').Get()
             if not unknown:
                 unknown = '{}'
@@ -73,7 +58,7 @@ class Base:
                 self._set_attribute(usd_prim, 'unknown', unknown_dict)
             
     def _set_attributes(self, usd_prim):
-        self.filter_keys()
+        self._filter_keys()
         
         if self.jsonData and len(self.jsonData) > 0:
             for key, val in self.jsonData.items():
@@ -108,6 +93,14 @@ class Base:
             prim_type = usd_prim.GetTypeName()
             print(f'\tCreated {prim_type} at {usd_path}')
 
-    def _filter_keys(self, keys):
+    def _remove_keys(self, keys):
         for key in keys:
             self.jsonData.pop(key, None)
+
+    def _create_usd(self, stage, usd_path, usd_type):
+        usd_prim = stage.DefinePrim(usd_path, usd_type)
+        if Options.verbose >= Verbose.INFO:
+            print(f'Created {usd_prim}')
+        self._set_attributes(usd_prim)
+        self._report(usd_prim, usd_path)
+        return usd_prim

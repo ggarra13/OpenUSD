@@ -7,9 +7,10 @@ from usdOtio.item import Item
 from usdOtio.gap import Gap
 from usdOtio.marker import Marker
 from usdOtio.transition import Transition
+from usdOtio.time_range_mixin import TimeRangeMixin
 
 
-class Track(Item):
+class Track(Item, TimeRangeMixin):
 
     FILTER_KEYS = [
         'children',
@@ -18,14 +19,6 @@ class Track(Item):
     def __init__(self, otio_item = None):
         super().__init__(otio_item)
         self.children = []
-        if otio_item:
-            self.enabled = otio_item.enabled
-            self.kind = otio_item.kind
-                
-    def create_stack(x = None):
-        stack_module = importlib.import_module("usdOtio.stack")
-        stack = stack_module.Stack(x)
-        return stack
         
     def from_json_string(self, s):
         self.jsonData = json.loads(s)
@@ -39,23 +32,23 @@ class Track(Item):
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
             child_prim = None
+            usd_name = x.GetName()
+            print(f'Processing {usd_name}')
             if usd_type == 'OtioClip':
                 child_prim = Clip()
-                self.children.append(child_prim)
             elif usd_type == 'OtioGap':
                 child_prim = Gap()
-                self.children.append(child_prim)
             elif usd_type == 'OtioTransition':
                 child_prim = Transition()
-                self.children.append(child_prim)
             elif usd_type == 'OtioStack':
-                child_prim = create_stack()
-                self.children.append(child_prim)
+                child_prim = self._create_stack(x)
             else:
                 pass
 
             if child_prim:
                 child_prim.from_usd(x)
+                self.children.append(child_prim)
+                print(f'children size={len(self.children)}')
 
         json_strings = [json.loads(x.to_json_string()) for x in self.children]
         self.jsonData['children'] = json_strings
@@ -63,25 +56,20 @@ class Track(Item):
         return self.jsonData
 
     def to_usd(self, stage, usd_path):
-        super().to_usd(stage, usd_path)
+        self._set_time_range(stage, usd_path, 'source_range')
             
-        if self.otio_item.source_range:
-            source_range_path = usd_path + '/source_range'
-            source_range_prim = TimeRange(self.jsonData['source_range'])
-            source_range_prim.to_usd(stage, source_range_path)
-            self.source_range = source_range_prim
-            
-        usd_prim = self.create_usd(stage, usd_path, 'OtioTrack')
+        usd_prim = self._create_usd(stage, usd_path, 'OtioTrack')
         
         return usd_prim
 
-    def filter_keys(self):
-        super().filter_keys()
-        self._filter_keys(Track.FILTER_KEYS)
+    def _filter_keys(self):
+        super()._filter_keys()
+        self._remove_keys(Track.FILTER_KEYS)
 
-            
-    def _set_attributes(self, usd_prim):
-        super()._set_attributes(usd_prim)
-        
-        self._set_attribute(usd_prim, "enabled", self.enabled)
-        self._set_attribute(usd_prim, "kind", self.kind)
+    def _create_stack(self, x = None):
+        #
+        # We need to use importlib to avoid cyclic dependencies
+        #
+        stack_module = importlib.import_module("usdOtio.stack")
+        stack = stack_module.Stack()
+        return stack
