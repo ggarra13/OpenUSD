@@ -107,7 +107,8 @@ class UsdOtio:
         """
         if self.mode == 'add':
             engine = UsdOtioAdd(self.usd_file, self.otio_file,
-                                self.output_file, self.path)
+                                self.output_file, self.path,
+                                self.noComment)
         elif self.mode == 'save':
             engine = UsdOtioSave(self.usd_file, self.otio_file, self.path)
         elif self.mode == 'v2':
@@ -221,7 +222,9 @@ class UsdOtio:
         add_parser.add_argument('-v', '--log', nargs='?',
                                 default=Verbose.QUIET, dest='verbose',
                                 type=self.parse_verbosity,
-                                help="Set verbosity level (debug, verbose, normal, quiet or integer value)")
+                                help='Set verbosity level:\n' \
+                                '\tdebug\n\tverbose\n\tnormal\n\tquiet\n\n\t' \
+                                'or integer value)')
         add_parser.add_argument('-y', '--yes', action='store_true',
                                 help='Answer yes to all questions')
         add_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -237,6 +240,9 @@ class UsdOtio:
                                 help='USD output file.  '
                                 'If no output file is provided, defaults to'
                                 'overwrite the same usd file.')
+        add_parser.add_argument('-n', '--noComment', action='store_true',
+                                help='do not write a comment specifying how ' \
+                                'the usd file was generated')
 
         #
         # 'save' parser
@@ -245,7 +251,9 @@ class UsdOtio:
         save_parser.add_argument('-v', '--log', nargs='?',
                                  default=Verbose.QUIET, dest='verbose',
                                  type=self.parse_verbosity,
-                                 help="Set verbosity level (debug, verbose, normal, quiet or integer value)")
+                                 help='Set verbosity level:\n' \
+                                 '\tdebug\n\tverbose\n\tnormal\n\tquiet\n\n\t' \
+                                 'or integer value)')
         save_parser.add_argument('-y', '--yes', action='store_true',
                                  help='Answer yes to all questions')
         save_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -257,6 +265,9 @@ class UsdOtio:
                                  help='Name of .otio file to add or save.')
         save_parser.add_argument('usd_file', type=str,
                                  help='Name of .usd file to extract otio data')
+        save_parser.add_argument('-n', '--noComment', action='store_true',
+                                 help='do not write a comment specifying how ' \
+                                 'the usd file was generated')
         
         #
         # 'v2' parser
@@ -265,7 +276,9 @@ class UsdOtio:
         v2_parser.add_argument('-v', '--log', nargs='?',
                                default=Verbose.QUIET, dest='verbose',
                                type=self.parse_verbosity,
-                               help="Set verbosity level (debug, verbose, normal, quiet or integer value)")
+                               help='Set verbosity level:\n' \
+                               '\tdebug\n\tverbose\n\tnormal\n\tquiet\n\n\t' \
+                               'or integer value)')
         v2_parser.add_argument('-y', '--yes', action='store_true',
                                help='Answer yes to all questions')
         v2_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
@@ -295,6 +308,7 @@ class UsdOtio:
 
         if self.mode != 'save':
             self.output_file = args.usd_output_file
+            self.noComment = args.noComment
 
         if self.mode != 'v2':
             self.path = args.usd_path

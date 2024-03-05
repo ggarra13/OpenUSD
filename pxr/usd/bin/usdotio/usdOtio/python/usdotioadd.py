@@ -45,11 +45,13 @@ from usdOtio.linear_time_warp import LinearTimeWarp
 
     
 class UsdOtioAdd:
-    def __init__(self, usd_file, otio_file, output_file, path = '/'):
+    def __init__(self, usd_file, otio_file, output_file, path = '/',
+                 comment = True):
         self.usd_file = usd_file
         self.otio_file = otio_file
         self.output_file = output_file
         self.path = path
+        self.comment = not comment
 
     def create_effect(self, stage, usd_path, effect):
         if isinstance(effect, otio.schema.LinearTimeWarp):
@@ -203,4 +205,5 @@ Valid OtioTimeline primitives in stage:''')
         if self.output_file == self.usd_file:
             print('WARNING: Overwriting USD file.')
             Options.continue_prompt()
-        stage.Export(self.output_file)
+
+        stage.Export(self.output_file, addSourceFileComment=self.comment)

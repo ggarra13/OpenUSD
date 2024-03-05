@@ -1,11 +1,4 @@
 #usda 1.0
-(
-    doc = """Generated from Composed Stage of root layer d:\\assets\\sphere.usda
-
-
-Generated from Composed Stage of root layer /media/gga/datos/code/applications/OpenUSD/pxr/usd/bin/usdotio/testenv/testUsdOtioAdd/a.usda
-"""
-)
 
 def Xform "hello"
 {
@@ -17,7 +10,7 @@ def Xform "hello"
 def OtioTimeline "otio"
 {
     uniform string metadata = "{}"
-    uniform string name = "SingleClip"
+    uniform string name = "LinearTimeWarp"
     uniform string OTIO_SCHEMA = "Timeline.1"
 
     def OtioStack "Stack"
@@ -87,6 +80,15 @@ def OtioTimeline "otio"
                             double value = 704
                         }
                     }
+                }
+
+                def OtioLinearTimeWarp "LinearTimeWarp_1"
+                {
+                    uniform string effect_name = "LinearTimeWarp"
+                    uniform string metadata = "{}"
+                    uniform string name = ""
+                    uniform string OTIO_SCHEMA = "LinearTimeWarp.1"
+                    double time_scalar = 0.75
                 }
             }
         }
