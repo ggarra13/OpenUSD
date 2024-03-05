@@ -65,7 +65,7 @@ class UsdOtioAdd:
     def get_first_stack(timeline):
         return None
 
-    def parse_effects(self, stage, usd_path, effecs):
+    def parse_effects(self, stage, usd_path, effects):
         for effect in effects:
             self.create_effect(stage, usd_path, effect)
             self.effect_index += 1
