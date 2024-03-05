@@ -192,10 +192,10 @@ Valid OtioTimeline primitives in stage:''')
                     usd_child_item.to_usd(stage, usd_path)
 
                     if can_have_effects:
-                        self.parse_effects(stage, usd_path, child.effecs)
+                        self.parse_effects(stage, usd_path, child.effects)
 
             if track.effects:
-                self.parse_effects(stage, usd_path, track.effecs)
+                self.parse_effects(stage, usd_path, track.effects)
         
         #
         # Export modified stage to output file
