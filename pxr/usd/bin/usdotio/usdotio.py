@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/pxrpythonsubst
 #
 # Copyright 2024 Gonzalo Garramuño
 #
