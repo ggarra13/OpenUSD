@@ -24,7 +24,7 @@ class Options:
     #
     #
     #
-    verbose = Verbose.QUIET
+    verbose = Verbose.NORMAL
 
     #
     # When this is True, we save the .otio file with python.

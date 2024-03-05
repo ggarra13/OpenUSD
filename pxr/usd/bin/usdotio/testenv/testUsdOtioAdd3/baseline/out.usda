@@ -1160,7 +1160,7 @@ def OtioTimeline "otio"
             uniform string name = "DX"
             uniform string OTIO_SCHEMA = "Track.1"
 
-            def OtioClip "Clip_1"
+            def OtioClip "Clip_32"
             {
                 uniform string active_media_reference_key = "DEFAULT_MEDIA"
                 bool enabled = 1
@@ -1213,7 +1213,7 @@ def OtioTimeline "otio"
             uniform string name = "DX"
             uniform string OTIO_SCHEMA = "Track.1"
 
-            def OtioClip "Clip_1"
+            def OtioClip "Clip_33"
             {
                 uniform string active_media_reference_key = "DEFAULT_MEDIA"
                 bool enabled = 1
@@ -1266,7 +1266,7 @@ def OtioTimeline "otio"
             uniform string name = "SFX"
             uniform string OTIO_SCHEMA = "Track.1"
 
-            def OtioClip "Clip_1"
+            def OtioClip "Clip_34"
             {
                 uniform string active_media_reference_key = "DEFAULT_MEDIA"
                 bool enabled = 1
@@ -1319,7 +1319,7 @@ def OtioTimeline "otio"
             uniform string name = "SFX"
             uniform string OTIO_SCHEMA = "Track.1"
 
-            def OtioClip "Clip_1"
+            def OtioClip "Clip_35"
             {
                 uniform string active_media_reference_key = "DEFAULT_MEDIA"
                 bool enabled = 1
@@ -1372,7 +1372,7 @@ def OtioTimeline "otio"
             uniform string name = "MX"
             uniform string OTIO_SCHEMA = "Track.1"
 
-            def OtioClip "Clip_1"
+            def OtioClip "Clip_36"
             {
                 uniform string active_media_reference_key = "DEFAULT_MEDIA"
                 bool enabled = 1
@@ -1425,7 +1425,7 @@ def OtioTimeline "otio"
             uniform string name = "MX"
             uniform string OTIO_SCHEMA = "Track.1"
 
-            def OtioClip "Clip_1"
+            def OtioClip "Clip_37"
             {
                 uniform string active_media_reference_key = "DEFAULT_MEDIA"
                 bool enabled = 1

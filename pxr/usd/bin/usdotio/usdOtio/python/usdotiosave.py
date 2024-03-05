@@ -33,7 +33,6 @@ Please run:
 #
 # usdOtio helper classes' imports here
 #
-from usdOtio.options import Options
 from usdOtio.clip import Clip
 from usdOtio.gap import Gap
 from usdOtio.options import Options, Verbose
@@ -101,6 +100,7 @@ Valid OtioTimeline primitives in stage:''')
         #
         timeline = Timeline()
         json_data = timeline.from_usd(usd_prim)
+        
         #
         # Check if otio file already exists
         #

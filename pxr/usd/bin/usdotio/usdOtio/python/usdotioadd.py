@@ -1,7 +1,7 @@
 #
 # Normal python imports
 #
-import sys
+import sys, os
 
 #
 # USD imports
@@ -33,7 +33,7 @@ Please run:
 #
 # usdOtio helper classes' imports here
 #
-from usdOtio.options import Options
+from usdOtio.options import Options, Verbose
 from usdOtio.clip import Clip
 from usdOtio.gap import Gap
 from usdOtio.stack import Stack
@@ -207,7 +207,17 @@ Valid OtioTimeline primitives in stage:''')
         # Export modified stage to output file
         #
         if self.output_file == self.usd_file:
-            print('WARNING: Overwriting USD file.')
+            print('WARNING: Saving over original USD file.')
             Options.continue_prompt()
+        else:
+            #
+            # Check if otio file already exists
+            #
+            if os.path.isfile(self.output_file):
+                if Options.verbose >= Verbose.NORMAL:
+                    print(f'"{self.otio_file}" already exists!  '
+                          'Will overwrite it.')
+                    Options.continue_prompt()
+                
 
         stage.Export(self.output_file, addSourceFileComment=self.comment)

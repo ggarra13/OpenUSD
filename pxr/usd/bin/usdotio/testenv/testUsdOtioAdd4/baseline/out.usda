@@ -50,9 +50,25 @@ def OtioTimeline "otio"
                 uniform string metadata = "{}"
                 uniform string name = ""
                 uniform string OTIO_SCHEMA = "Stack.1"
+
+                def OtioClip "Clip_2"
+                {
+                    uniform string active_media_reference_key = "DEFAULT_MEDIA"
+                    bool enabled = 1
+                    uniform string metadata = "{}"
+                    uniform string name = ""
+                    uniform string OTIO_SCHEMA = "Clip.2"
+
+                    def OtioMissingReference "missing_reference"
+                    {
+                        uniform string metadata = "{}"
+                        uniform string name = ""
+                        uniform string OTIO_SCHEMA = "MissingReference.1"
+                    }
+                }
             }
 
-            def OtioClip "Clip_2"
+            def OtioClip "Clip_3"
             {
                 uniform string active_media_reference_key = "DEFAULT_MEDIA"
                 bool enabled = 1

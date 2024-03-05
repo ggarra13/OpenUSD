@@ -224,7 +224,7 @@ class UsdOtio:
         #
         add_parser = subparsers.add_parser('add', help='Add mode')
         add_parser.add_argument('-v', '--log', nargs='?',
-                                default=Verbose.QUIET, dest='verbose',
+                                default=Verbose.NORMAL, dest='verbose',
                                 type=self.parse_verbosity,
                                 help='Set verbosity level: ' \
                                 'debug verbose info normal quiet ' \
@@ -253,7 +253,7 @@ class UsdOtio:
         #
         save_parser = subparsers.add_parser('save', help='Save mode')
         save_parser.add_argument('-v', '--log', nargs='?',
-                                 default=Verbose.QUIET, dest='verbose',
+                                 default=Verbose.NORMAL, dest='verbose',
                                  type=self.parse_verbosity,
                                  help='Set verbosity level: ' \
                                  'debug verbose info normal quiet ' \
@@ -278,7 +278,7 @@ class UsdOtio:
         #
         v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
         v2_parser.add_argument('-v', '--log', nargs='?',
-                               default=Verbose.QUIET, dest='verbose',
+                               default=Verbose.NORMAL, dest='verbose',
                                type=self.parse_verbosity,
                                  help='Set verbosity level: ' \
                                  'debug verbose info normal quiet ' \
