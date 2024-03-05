@@ -65,6 +65,11 @@ class UsdOtioAdd:
     def get_first_stack(timeline):
         return None
 
+    def parse_effects(self, stage, usd_path, effecs):
+        for effect in effects:
+            self.create_effect(stage, usd_path, effect)
+            self.effect_index += 1
+    
     def run(self):
         """
         Run the otio add algorithm.
@@ -187,14 +192,10 @@ Valid OtioTimeline primitives in stage:''')
                     usd_child_item.to_usd(stage, usd_path)
 
                     if can_have_effects:
-                        for effect in child.effects:
-                            self.create_effect(stage, usd_path, effect)
-                            self.effect_index += 1
+                        self.parse_effects(stage, usd_path, child.effecs)
 
             if track.effects:
-                for effect in track.effects:
-                    self.create_effect(stage, usd_path, effect)
-                    self.effect_index += 1
+                self.parse_effects(stage, usd_path, track.effecs)
         
         #
         # Export modified stage to output file

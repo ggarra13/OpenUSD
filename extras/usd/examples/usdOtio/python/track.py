@@ -1,5 +1,5 @@
 
-import json
+import json, importlib
 
 from usdOtio.clip import Clip
 from usdOtio.effect import Effect
@@ -21,6 +21,11 @@ class Track(Item):
         if otio_item:
             self.enabled = otio_item.enabled
             self.kind = otio_item.kind
+                
+    def create_stack(x = None):
+        stack_module = importlib.import_module("usdOtio.stack")
+        stack = stack_module.Stack(x)
+        return stack
         
     def from_json_string(self, s):
         self.jsonData = json.loads(s)
@@ -42,6 +47,9 @@ class Track(Item):
                 self.children.append(child_prim)
             elif usd_type == 'OtioTransition':
                 child_prim = Transition()
+                self.children.append(child_prim)
+            elif usd_type == 'OtioStack':
+                child_prim = create_stack()
                 self.children.append(child_prim)
             else:
                 pass
