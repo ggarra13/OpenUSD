@@ -5,11 +5,11 @@ from usdOtio.time_range import TimeRange
 
 class TimeRangeMixin:
     def _set_time_range(self, stage, usd_path, name):
-        s = self.jsonData.get(name)
         range_prim = None
-        if s:
+        json_data = self.jsonData.get(name)
+        if json_data:
             range_path = usd_path + f'/{name}'
-            range_prim = TimeRange(s)
+            range_prim = TimeRange(json_data)
             range_prim.to_usd(stage, range_path)
             if Options.verbose == Verbose.DEBUG:
                 print(f'\t\tCreated time range at {range_path}')

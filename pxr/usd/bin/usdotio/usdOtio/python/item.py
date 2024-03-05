@@ -2,19 +2,18 @@
 import json
 
 from usdOtio.box2d import Box2d
+from usdOtio.composable import Composable
 from usdOtio.effect import Effect
 from usdOtio.linear_time_warp import LinearTimeWarp
 from usdOtio.marker import Marker
-from usdOtio.named_base import NamedBase
 from usdOtio.time_range_mixin import TimeRangeMixin
 
-class Item(NamedBase, TimeRangeMixin):
+class Item(Composable, TimeRangeMixin):
 
     FILTER_KEYS = [
         'effects',
         'markers',
         'source_range',
-        'available_image_bounds',
     ]
     
     def __init__(self, otio_item = None):
@@ -64,7 +63,7 @@ class Item(NamedBase, TimeRangeMixin):
                 self.append_effect(effect_prim)
             else:
                 pass
-            
+        
         json_strings = [json.loads(x.to_json_string()) for x in self.effects]
         self.jsonData['effects'] = json_strings
         
@@ -77,12 +76,6 @@ class Item(NamedBase, TimeRangeMixin):
 
     def to_usd(self, stage, usd_path):
         self._set_time_range(stage, usd_path, 'source_range')
-
-        if self.jsonData.get('available_image_bounds'):
-            json_data = self.jsonData['available_image_bounds']
-            box2d_prim = Box2d(json_data)
-            box2d_path = usd_path + '/available_image_bounds'
-            box2d_prim.to_usd(stage, box2d_path)
         
         marker_index = 1
         for m in self.otio_item.markers:

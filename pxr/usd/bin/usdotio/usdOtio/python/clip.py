@@ -4,16 +4,18 @@ import json
 
 import opentimelineio as otio
     
+from usdOtio.box2d_mixin import Box2dMixin
 from usdOtio.external_reference import ExternalReference
 from usdOtio.image_sequence_reference import ImageSequenceReference
 from usdOtio.item import Item
 from usdOtio.missing_reference import MissingReference
 from usdOtio.options import Options, Verbose
 
-class Clip(Item):
+class Clip(Item, Box2dMixin):
 
     FILTER_KEYS = [
         'media_references',
+        'available_image_bounds',
     ]
     
     def __init__(self, otio_item = None):
@@ -66,6 +68,8 @@ class Clip(Item):
     def to_usd(self, stage, usd_path): 
         super().to_usd(stage, usd_path)
         
+        self._set_box2d(stage, usd_path, 'available_image_bounds')
+            
         usd_prim = self._create_usd(stage, usd_path, 'OtioClip')
         
         m = self.otio_item.media_reference

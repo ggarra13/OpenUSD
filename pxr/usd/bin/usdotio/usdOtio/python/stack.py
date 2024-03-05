@@ -20,8 +20,6 @@ class Stack(Item, TimeRangeMixin, RationalTimeMixin):
     def __init__(self, otio_item = None):
         super().__init__(otio_item)
         self.children = []
-        self.effects = []
-        self.markers = []
         if not otio_item:
             self.jsonData = json.loads(otio.schema.Stack().to_json_string())
         
@@ -46,7 +44,6 @@ class Stack(Item, TimeRangeMixin, RationalTimeMixin):
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
             usd_name = x.GetName()
-            print(f'Processing {usd_name}')
             child_prim = None
             if usd_type == 'OtioTrack':
                 child_prim = Track()
@@ -73,12 +70,6 @@ class Stack(Item, TimeRangeMixin, RationalTimeMixin):
             if child_prim:
                 child_prim.from_usd(x)
                 self.append_child(child_prim)
-            
-        json_strings = [json.loads(x.to_json_string()) for x in self.effects]
-        self.jsonData['effects'] = json_strings
-        
-        json_strings = [json.loads(x.to_json_string()) for x in self.markers]
-        self.jsonData['markers'] = json_strings
         
         json_strings = [json.loads(x.to_json_string()) for x in self.children]
         self.jsonData['children'] = json_strings

@@ -2,8 +2,9 @@
 import json
 
 from usdOtio.named_base import NamedBase
+from usdOtio.time_range_mixin import TimeRangeMixin
 
-class Marker(NamedBase):
+class Marker(NamedBase, TimeRangeMixin):
     
     FILTER_KEYS = [
         'marked_range',
@@ -28,11 +29,8 @@ class Marker(NamedBase):
         return self.jsonData
     
     def to_usd(self, stage, usd_path):
-        if self.otio_item.marked_range:
-            marker_path = usd_path + '/marked_range'
-            marker_prim = TimeRange(self.jsonData['marked_range'])
-            marker_prim.to_usd(stage, marker_path)
-            
+        self._set_time_range(stage, usd_path, 'marked_range')
+        
         usd_prim = self._create_usd(stage, usd_path, 'OtioMarker')
         return usd_prim
         

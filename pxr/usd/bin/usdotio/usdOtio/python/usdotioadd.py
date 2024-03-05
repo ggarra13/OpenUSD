@@ -103,14 +103,13 @@ class UsdOtioAdd:
                 self.parse_effects(stage, usd_path, child.effects)
                     
     def recurse_track(self, stage, track_path, track):
-        for track in track:
-            self.process_child(stage, track_path, track)
+        for child in track:
+            self.process_child(stage, track_path, child)
 
-            if track.effects:
-                self.parse_effects(stage, track_path, track.effects)
+        if track.effects:
+            self.parse_effects(stage, track_path, track.effects)
 
     def recurse_stack(self, stage, stack_path, stack):
-        
         for child in stack:
             if isinstance(child, otio.schema.Track):
                 if child.kind == 'Video':
@@ -136,13 +135,14 @@ class UsdOtioAdd:
         #
         # Initialize some counters
         #
-        self.track_index = 1
-        self.video_track_index = 1
         self.audio_track_index = 1
-        self.gap_index = 1
         self.clip_index = 1
+        self.effect_index = 1
+        self.gap_index = 1
         self.stack_index = 1
+        self.track_index = 1
         self.transition_index = 1
+        self.video_track_index = 1
         
         #
         # Open the original scene file
@@ -201,7 +201,6 @@ Valid OtioTimeline primitives in stage:''')
             usd_stack_item = Stack(otio.schema.Stack())
         usd_stack_item.to_usd(stage, stack_path)
 
-        self.effect_index = 1
         self.recurse_stack(stage, stack_path, stack)
         
         #

@@ -11,11 +11,13 @@ test_usdotio()
     otio_cat=/tmp/orig_cat.otio
     otio_out_cat=/tmp/new_cat.otio
 
-    usdotio add -o "${usd_out}" "${otio}" "${usd}"
-
-    usdview ${usd_out}
-    exit 0
+    rm -f "${usd_out}"
     
+    usdotio add -o "${usd_out}" "${otio}" "${usd}"
+    
+    rm -f "${otio_out}"
+
+    echo "Comparing ${otio_out} ${otio}"
     usdotio save "${otio_out}" "${usd_out}"
 
     otiocat "${otio}" > "${otio_cat}"
@@ -42,15 +44,11 @@ fi
 . $ROOT/bin/env.sh
 
 cd ~/Movies
+for i in *.otio; do
+    test_usdotio $i ~/assets/sphere.usda
+done
 
-file=nested_stack.otio
-test_usdotio $file ~/assets/sphere.usda
-
-# for i in *.otio; do
-#     test_usdotio $i ~/assets/sphere.usda
-# done
-
-# cd ~/code/applications/mrv2/tlRender/etc/SampleData
-# for i in *.otio; do
-#     test_usdotio $i ~/assets/sphere.usda
-# done
+cd ~/code/applications/mrv2/tlRender/etc/SampleData
+for i in *.otio; do
+    test_usdotio $i ~/assets/sphere.usda
+done
