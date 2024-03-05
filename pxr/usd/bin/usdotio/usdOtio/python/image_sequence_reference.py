@@ -22,11 +22,11 @@ class ImageSequenceReference(MediaReference):
         super()._filter_keys()
         self._remove_keys(ImageSequenceReference.FILTER_KEYS)
 
-    def _set_attributes(self, usd_prim):
+    def _set_usd_attributes(self, usd_prim):
         
         # USD does not accept variant sets in schemas
         policy = self.jsonData['missing_frame_policy']
         policy = policy.removeprefix('MissingFramePolicy.')
-        self._set_attribute(usd_prim, 'missing_frame_policy', policy) 
+        self._set_usd_attribute(usd_prim, 'missing_frame_policy', policy) 
         
-        super()._set_attributes(usd_prim)
+        super()._set_usd_attributes(usd_prim)

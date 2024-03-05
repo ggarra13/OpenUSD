@@ -52,6 +52,17 @@ class UsdOtioAdd:
         self.output_file = output_file
         self.path = path
         self.comment = not comment
+        #
+        # Initialize some counters
+        #
+        self.audio_track_index = 1
+        self.clip_index = 1
+        self.effect_index = 1
+        self.gap_index = 1
+        self.stack_index = 1
+        self.track_index = 1
+        self.transition_index = 1
+        self.video_track_index = 1
 
     def create_effect(self, stage, usd_path, effect):
         if isinstance(effect, otio.schema.LinearTimeWarp):
@@ -69,35 +80,33 @@ class UsdOtioAdd:
             self.effect_index += 1
 
     def process_child(self, stage, track_path, child):
-        usd_child_item = None
+        usd_item = None
         usd_path = None
-        can_have_effects = False
+        can_have_effects = True
                 
         if isinstance(child, otio.schema.Clip):
             usd_path = track_path + f'/Clip_{self.clip_index}'
-            usd_child_item = Clip(child)
-            can_have_effects = True
+            usd_item = Clip(child)
             self.clip_index += 1
         elif isinstance(child, otio.schema.Transition):
             usd_path = track_path + f'/Transition_{self.transition_index}'
-            usd_child_item = Transition(child)
+            usd_item = Transition(child)
+            can_have_effects = False
             self.transition_index += 1
         elif isinstance(child, otio.schema.Gap):
             usd_path = track_path + f'/Gap_{self.gap_index}'
-            usd_child_item = Gap(child)
-            can_have_effects = True
+            usd_item = Gap(child)
             self.gap_index += 1
         elif isinstance(child, otio.schema.Stack):
             usd_path = track_path + f'/Stack_{self.stack_index}'
-            usd_child_item = Stack(child)
-            can_have_effects = True
+            usd_item = Stack(child)
             self.stack_index += 1
             self.recurse_stack(stage, usd_path, child)
         else:
             print('WARNING: Unknown child {child}')
                 
-        if usd_child_item:
-            usd_child_item.to_usd(stage, usd_path)
+        if usd_item:
+            usd_item.to_usd(stage, usd_path)
 
             if can_have_effects:
                 self.parse_effects(stage, usd_path, child.effects)
@@ -132,17 +141,6 @@ class UsdOtioAdd:
         """
         Run the otio add algorithm.
         """
-        #
-        # Initialize some counters
-        #
-        self.audio_track_index = 1
-        self.clip_index = 1
-        self.effect_index = 1
-        self.gap_index = 1
-        self.stack_index = 1
-        self.track_index = 1
-        self.transition_index = 1
-        self.video_track_index = 1
         
         #
         # Open the original scene file
@@ -190,7 +188,7 @@ Valid OtioTimeline primitives in stage:''')
         usd_otio_item = Timeline(timeline)
         usd_otio_item.to_usd(stage, usd_path)
 
-        # Check if there's a stacks attribute (this is broken in Python)
+        # Check if there's a stacks attribute.
         stack = None
         stack_path = usd_path + '/Stack'
         

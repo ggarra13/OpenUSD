@@ -29,10 +29,10 @@ class V2d(Base):
     
     def to_usd(self, stage, usd_path):
         usd_prim = stage.DefinePrim(usd_path, 'OtioV2d')
-        self._set_attributes(usd_prim)
+        self._set_usd_attributes(usd_prim)
         return usd_prim
     
-    def _set_attributes(self, usd_prim):   
+    def _set_usd_attributes(self, usd_prim):   
         attr = usd_prim.GetAttribute('x')
         attr.Set(self.jsonData['x'])
         

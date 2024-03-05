@@ -21,7 +21,7 @@ class Base:
         return json.dumps(self.jsonData)
 
     def from_usd(self, usd_prim):
-        self._get_attributes(usd_prim)
+        self._get_usd_attributes(usd_prim)
         return self.jsonData
 
     def to_usd(self, stage, usd_path):
@@ -30,7 +30,7 @@ class Base:
     def _filter_keys(self):
         pass
     
-    def _set_attribute(self, usd_prim, key, value):
+    def _set_usd_attribute(self, usd_prim, key, value):
         if Options.verbose >= Verbose.VERBOSE:
             print(f'\t\tSetting {key} = {value}')
         attr = usd_prim.GetAttribute(key)
@@ -55,27 +55,27 @@ class Base:
             if isinstance(unknown, str):
                 unknown_dict = json.loads(unknown)
                 unknown_dict[key] = value
-                self._set_attribute(usd_prim, 'unknown', unknown_dict)
+                self._set_usd_attribute(usd_prim, 'unknown', unknown_dict)
             
-    def _set_attributes(self, usd_prim):
+    def _set_usd_attributes(self, usd_prim):
         self._filter_keys()
         
         if self.jsonData and len(self.jsonData) > 0:
             for key, val in self.jsonData.items():
-                self._set_attribute(usd_prim, key, val)
+                self._set_usd_attribute(usd_prim, key, val)
     
-    def _get_attribute(self, usd_prim, key):
+    def _get_usd_attribute(self, usd_prim, key):
         val = usd_prim.GetAttribute(key).Get()
         self.jsonData[key] = val
         
-    def _get_attributes(self, usd_prim):
+    def _get_usd_attributes(self, usd_prim):
         attrs = usd_prim.GetPropertyNames()
         for attr in attrs:
             if attr == 'unknown':
                 continue
-            self._get_attribute(usd_prim, attr)
+            self._get_usd_attribute(usd_prim, attr)
 
-        self._get_attribute(usd_prim, 'unknown')
+        self._get_usd_attribute(usd_prim, 'unknown')
         unknown = self.jsonData['unknown']
         if unknown and len(unknown) > 0:
             unknown_dict = json.loads(unknown)
@@ -101,6 +101,6 @@ class Base:
         usd_prim = stage.DefinePrim(usd_path, usd_type)
         if Options.verbose >= Verbose.INFO:
             print(f'Created {usd_prim}')
-        self._set_attributes(usd_prim)
+        self._set_usd_attributes(usd_prim)
         self._report(usd_prim, usd_path)
         return usd_prim

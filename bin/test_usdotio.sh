@@ -11,9 +11,8 @@ test_usdotio()
     otio_cat=/tmp/orig_cat.otio
     otio_out_cat=/tmp/new_cat.otio
 
-    rm -f "${usd_out}"
-    
-    usdotio add -o "${usd_out}" "${otio}" "${usd}"
+    echo "Creating ${usd_out}"
+    usdotio add -o "${usd_out}" "${otio}" "${usd}" -y
     
     rm -f "${otio_out}"
 

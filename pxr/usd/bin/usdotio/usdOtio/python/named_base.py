@@ -25,13 +25,13 @@ class NamedBase(Base):
         super()._filter_keys()
         self._remove_keys(NamedBase.FILTER_KEYS)
 
-    def _set_attributes(self, usd_prim):
-        self._set_attribute(usd_prim, 'metadata', self.metadata)
+    def _set_usd_attributes(self, usd_prim):
+        self._set_usd_attribute(usd_prim, 'metadata', self.metadata)
         
-        super()._set_attributes(usd_prim)
+        super()._set_usd_attributes(usd_prim)
 
-    def _get_attributes(self, usd_prim):
-        super()._get_attributes(usd_prim)
+    def _get_usd_attributes(self, usd_prim):
+        super()._get_usd_attributes(usd_prim)
 
         # Convert the metadata string into an actual dict
         metadata = self.jsonData.get('metadata')

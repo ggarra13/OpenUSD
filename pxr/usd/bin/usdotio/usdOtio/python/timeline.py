@@ -54,7 +54,7 @@ class Timeline(NamedBase, RationalTimeMixin):
         return usd_prim
 
 
-    def _set_attributes(self, usd_prim):
+    def _set_usd_attributes(self, usd_prim):
         #
         # Check if data is not empty
         #
@@ -66,6 +66,6 @@ class Timeline(NamedBase, RationalTimeMixin):
             print(f'{old_data[:256]}...')
             Options.continue_prompt()
 
-        super()._set_attributes(usd_prim)
+        super()._set_usd_attributes(usd_prim)
 
         
