@@ -10,6 +10,6 @@ install(
     )
 
 install(
-    DIRECTORY python/usdOtio
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python/
+    DIRECTORY python/
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python/usdOtio
     )
