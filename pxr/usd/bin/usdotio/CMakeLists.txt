@@ -8,6 +8,21 @@ pxr_python_bin(usdotio
     sdf
 )
 
+set(_extrasDirectory usdOtio)
+
+install(
+    FILES
+    ${_extrasDirectory}/generatedSchema.usda
+    ${_extrasDirectory}/plugInfo.json
+    ${_extrasDirectory}/schema.usda
+    
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/usd/examples/plugin/usdOtio
+    )
+
+install(
+    DIRECTORY ${_extrasDirectory}/python/
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python/usdOtio
+    )
 
 pxr_install_test_dir(
     SRC testenv/testUsdOtioAdd

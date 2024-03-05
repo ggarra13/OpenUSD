@@ -23,6 +23,10 @@
 # language governing permissions and limitations under the Apache License.
 #
 
+VERSION = '0.0.1'
+
+
+
 #
 # Python standard imports
 #
@@ -354,6 +358,8 @@ class UsdOtio:
                     print(f'Saving to "{self.otio_file}"')
 
 if __name__ == '__main__':
+    if Options.verbose >= Verbose.INFO.value:
+        print(f'usdotio v{VERSION}')
     usd_otio = UsdOtio()
     exit(0)
     
