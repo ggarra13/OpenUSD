@@ -1,26 +1,27 @@
 set(PXR_PREFIX pxr/usd)
 set(PXR_PACKAGE usd)
 
+set(_usdOtioDirectory usdOtio)
+
+install(
+    FILES
+    ${_usdOtioDirectory}/generatedSchema.usda
+    ${_usdOtioDirectory}/plugInfo.json
+    ${_usdOtioDirectory}/schema.usda
+    
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/usd/examples/plugin/usdOtio
+)
+
+
 pxr_python_bin(usdotio
     DEPENDENCIES
-    usd
     tf
     sdf
 )
 
-set(_extrasDirectory usdOtio)
 
 install(
-    FILES
-    ${_extrasDirectory}/generatedSchema.usda
-    ${_extrasDirectory}/plugInfo.json
-    ${_extrasDirectory}/schema.usda
-    
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/usd/examples/plugin/usdOtio
-    )
-
-install(
-    DIRECTORY ${_extrasDirectory}/python/
+    DIRECTORY ${_usdOtioDirectory}/python/
     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python/usdOtio
     )
 
