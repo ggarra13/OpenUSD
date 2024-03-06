@@ -20,7 +20,7 @@ pxr_python_bin(usdotio
 )
 
 install(
-    DIRECTORY ${_usdOtioDirectory}/python/
+    DIRECTORY lib/python/
     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python/usdOtio
     )
 
