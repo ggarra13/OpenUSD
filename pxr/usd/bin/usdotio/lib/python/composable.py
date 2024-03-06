@@ -22,7 +22,7 @@
 #
 
 
-from usdOtio.named_base import NamedBase
+from usdotio.named_base import NamedBase
 
 class Composable(NamedBase):
     pass

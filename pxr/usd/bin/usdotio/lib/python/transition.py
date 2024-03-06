@@ -25,8 +25,8 @@ import json
 
 import opentimelineio as otio
 
-from usdOtio.named_base import NamedBase
-from usdOtio.rational_time_mixin import RationalTimeMixin
+from usdotio.named_base import NamedBase
+from usdotio.rational_time_mixin import RationalTimeMixin
 
 class Transition(NamedBase, RationalTimeMixin):
     """A class defining a Transition.  It defaults to a SMPTE_Dissolve.

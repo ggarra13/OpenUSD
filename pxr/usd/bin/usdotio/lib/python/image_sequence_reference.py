@@ -23,7 +23,7 @@
 
 import json
 
-from usdOtio.media_reference import MediaReference
+from usdotio.media_reference import MediaReference
 
 class ImageSequenceReference(MediaReference):
     """Class that handles an image sequence media reference.

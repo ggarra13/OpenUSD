@@ -23,11 +23,11 @@
 
 import json
 
-from usdOtio.composable import Composable
-from usdOtio.effect import Effect
-from usdOtio.linear_time_warp import LinearTimeWarp
-from usdOtio.marker import Marker
-from usdOtio.time_range_mixin import TimeRangeMixin
+from usdotio.composable import Composable
+from usdotio.effect import Effect
+from usdotio.linear_time_warp import LinearTimeWarp
+from usdotio.marker import Marker
+from usdotio.time_range_mixin import TimeRangeMixin
 
 class Item(Composable, TimeRangeMixin):
     """Base abstract class for Items.  It handles "effects",
@@ -37,7 +37,7 @@ class Item(Composable, TimeRangeMixin):
     And derived classes that have additional special attributes
     might need to override also from_usd(). 
 
-    See: usdOtio.clip.Clip.
+    See: usdotio.clip.Clip.
 
     """
 

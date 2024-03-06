@@ -23,7 +23,7 @@
 
 import json
 
-from usdOtio.base import Base
+from usdotio.base import Base
 
 class RationalTime(Base):
     """Class defining a RationalTime (value/ratio).

@@ -22,8 +22,8 @@
 #
 
 
-from usdOtio.options import Options, LogLevel
-from usdOtio.box2d import Box2d
+from usdotio.options import Options, LogLevel
+from usdotio.box2d import Box2d
 
 class Box2dMixin:
     def _set_box2d(self, stage, usd_path, name):

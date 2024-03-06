@@ -55,7 +55,7 @@ share_parts = [install_path, 'share', 'usd', 'examples', 'plugin', 'usdOtio']
 otio_plugin_dir = os.path.sep.join(share_parts)
 
 #
-# Add usdOtio directory to PXR_PLUGINPATH_NAME
+# Add usdotio directory to PXR_PLUGINPATH_NAME
 #
 plugin_path = os.environ.get('PXR_PLUGINPATH_NAME', '')
 os.environ['PXR_PLUGINPATH_NAME'] = plugin_path + os.pathsep + otio_plugin_dir
@@ -86,11 +86,11 @@ Check PATH on Windows.
     exit(1)
 
 #
-# usdOtio imports
+# usdotio imports
 #
-from usdOtio.options import Options, LogLevel
-from usdOtio.usdotioadd import UsdOtioAdd
-from usdOtio.usdotiosave import UsdOtioSave
+from usdotio.options import Options, LogLevel
+from usdotio.usdotioadd import UsdOtioAdd
+from usdotio.usdotiosave import UsdOtioSave
 
 class UsdOtio:
     """

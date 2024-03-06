@@ -26,12 +26,12 @@ import json
 
 import opentimelineio as otio
     
-from usdOtio.box2d_mixin import Box2dMixin
-from usdOtio.external_reference import ExternalReference
-from usdOtio.image_sequence_reference import ImageSequenceReference
-from usdOtio.item import Item
-from usdOtio.missing_reference import MissingReference
-from usdOtio.options import Options, LogLevel
+from usdotio.box2d_mixin import Box2dMixin
+from usdotio.external_reference import ExternalReference
+from usdotio.image_sequence_reference import ImageSequenceReference
+from usdotio.item import Item
+from usdotio.missing_reference import MissingReference
+from usdotio.options import Options, LogLevel
 
 class Clip(Item, Box2dMixin):
 

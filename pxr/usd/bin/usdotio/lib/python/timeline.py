@@ -23,10 +23,10 @@
 
 import json
 
-from usdOtio.named_base import NamedBase
-from usdOtio.options import Options
-from usdOtio.rational_time_mixin import RationalTimeMixin
-from usdOtio.stack import Stack
+from usdotio.named_base import NamedBase
+from usdotio.options import Options
+from usdotio.rational_time_mixin import RationalTimeMixin
+from usdotio.stack import Stack
 
 class Timeline(NamedBase, RationalTimeMixin):
 

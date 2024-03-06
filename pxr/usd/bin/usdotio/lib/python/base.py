@@ -25,14 +25,14 @@ import json
 
 import pxr
 
-from usdOtio.options import Options, LogLevel
+from usdotio.options import Options, LogLevel
 
 class Base:
     """Base abstract class.  Derived classes may override many of its
     methods.  At the very least, a concrete class should override
     to_usd().
 
-    The usdOtion schema defines an 'unknown' attribute which is used to
+    The usdotion schema defines an 'unknown' attribute which is used to
     be compatible with potential new parameters that the schema does not
     support.
 

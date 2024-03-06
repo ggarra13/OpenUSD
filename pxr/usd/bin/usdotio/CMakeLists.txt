@@ -21,7 +21,7 @@ pxr_python_bin(usdotio
 
 install(
     DIRECTORY lib/python/
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python/usdOtio
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python/usdotio
     )
 
 pxr_install_test_dir(

@@ -55,17 +55,17 @@ Please run:
     exit(1)
         
 #
-# usdOtio helper classes' imports here
+# usdotio helper classes' imports here
 #
-from usdOtio.options import Options, LogLevel
-from usdOtio.clip import Clip
-from usdOtio.gap import Gap
-from usdOtio.stack import Stack
-from usdOtio.timeline import Timeline
-from usdOtio.transition import Transition
-from usdOtio.track import Track
-from usdOtio.effect import Effect
-from usdOtio.linear_time_warp import LinearTimeWarp
+from usdotio.options import Options, LogLevel
+from usdotio.clip import Clip
+from usdotio.gap import Gap
+from usdotio.stack import Stack
+from usdotio.timeline import Timeline
+from usdotio.transition import Transition
+from usdotio.track import Track
+from usdotio.effect import Effect
+from usdotio.linear_time_warp import LinearTimeWarp
 
     
 class UsdOtioAdd:

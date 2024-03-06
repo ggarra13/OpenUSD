@@ -25,8 +25,8 @@ import json
 
 import opentimelineio as otio
 
-from usdOtio.composition import Composition
-from usdOtio.time_range_mixin import TimeRangeMixin
+from usdotio.composition import Composition
+from usdotio.time_range_mixin import TimeRangeMixin
 
 
 class Track(Composition):

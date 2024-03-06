@@ -23,7 +23,7 @@
 
 import json
 
-from usdOtio.item import Item
+from usdotio.item import Item
 
 class Gap(Item):
     """Class defining a Gap (a hole in the track).

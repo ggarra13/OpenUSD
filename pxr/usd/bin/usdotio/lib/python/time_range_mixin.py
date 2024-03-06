@@ -22,8 +22,8 @@
 #
 
 
-from usdOtio.options import Options, LogLevel
-from usdOtio.time_range import TimeRange
+from usdotio.options import Options, LogLevel
+from usdotio.time_range import TimeRange
 
 class TimeRangeMixin:
     """Mixing used to set or create a TimeRange.
@@ -39,7 +39,7 @@ class TimeRangeMixin:
         name (str): Name of the time range attribute.
 
         Returns:
-        TimeRange: Returns the usdOtio TimeRange or None.
+        TimeRange: Returns the usdotio TimeRange or None.
 
         """
 

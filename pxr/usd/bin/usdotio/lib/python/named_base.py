@@ -23,8 +23,8 @@
 
 import json
 
-from usdOtio.base       import Base
-from usdOtio.options    import Options, LogLevel
+from usdotio.base       import Base
+from usdotio.options    import Options, LogLevel
 
 class NamedBase(Base):
 

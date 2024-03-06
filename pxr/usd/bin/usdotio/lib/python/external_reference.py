@@ -23,7 +23,7 @@
 
 import json
 
-from usdOtio.media_reference import MediaReference
+from usdotio.media_reference import MediaReference
 
 class ExternalReference(MediaReference):
     """Class that handles an external media reference, like a video.

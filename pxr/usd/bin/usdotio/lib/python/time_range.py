@@ -23,8 +23,8 @@
 
 import json
 
-from usdOtio.base import Base
-from usdOtio.rational_time_mixin import RationalTimeMixin
+from usdotio.base import Base
+from usdotio.rational_time_mixin import RationalTimeMixin
 
 class TimeRange(Base, RationalTimeMixin):
     """Class holding a TimeRange.

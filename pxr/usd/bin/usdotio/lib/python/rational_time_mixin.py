@@ -22,8 +22,8 @@
 #
 
 
-from usdOtio.options import Options, LogLevel
-from usdOtio.rational_time import RationalTime
+from usdotio.options import Options, LogLevel
+from usdotio.rational_time import RationalTime
 
 class RationalTimeMixin:
     """Mixin class to create a RationalTime or convert it.
@@ -39,7 +39,7 @@ class RationalTimeMixin:
         name (str): Name of the time range attribute.
 
         Returns:
-        RationalTime: Returns the usdOtio RationalTime or None.
+        RationalTime: Returns the usdotio RationalTime or None.
 
         """
         json_data = self.jsonData.get(name)

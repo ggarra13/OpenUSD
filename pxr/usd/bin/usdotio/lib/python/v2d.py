@@ -23,7 +23,7 @@
 
 import json
 
-from usdOtio.base import Base
+from usdotio.base import Base
 
 class V2d(Base):
     """Class used to parse an Imath::V2d

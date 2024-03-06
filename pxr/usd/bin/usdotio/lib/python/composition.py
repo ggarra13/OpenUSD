@@ -23,13 +23,13 @@
 
 import json, importlib
 
-from usdOtio.clip import Clip
-from usdOtio.gap import Gap
-from usdOtio.item import Item
-from usdOtio.options import Options, LogLevel
-from usdOtio.rational_time_mixin import RationalTimeMixin
-from usdOtio.time_range_mixin import TimeRangeMixin
-from usdOtio.transition import Transition
+from usdotio.clip import Clip
+from usdotio.gap import Gap
+from usdotio.item import Item
+from usdotio.options import Options, LogLevel
+from usdotio.rational_time_mixin import RationalTimeMixin
+from usdotio.time_range_mixin import TimeRangeMixin
+from usdotio.transition import Transition
 
 class Composition(Item, TimeRangeMixin, RationalTimeMixin):
     """Abstract class to handle a composition (ie. one that can hold Track,
@@ -50,7 +50,7 @@ class Composition(Item, TimeRangeMixin, RationalTimeMixin):
         """Append a child to this Composition.
 
         Args:
-        child (usdOtio): usdOtio class to append, like usdOtio.clip.Clip
+        child (usdotio): usdOtio class to append, like usdOtio.clip.Clip
 
         Returns:
         None
@@ -114,10 +114,10 @@ class Composition(Item, TimeRangeMixin, RationalTimeMixin):
         None
 
         Returns:
-        usdOtio.stack.Stack: a valid usdOtio Stack.
+        usdotio.stack.Stack: a valid usdOtio Stack.
         """
         # We need to use importlib to avoid cyclic dependencies
-        stack_module = importlib.import_module("usdOtio.stack")
+        stack_module = importlib.import_module("usdotio.stack")
         return stack_module.Stack()
 
     def _create_track(self):
@@ -127,8 +127,8 @@ class Composition(Item, TimeRangeMixin, RationalTimeMixin):
         None
 
         Returns:
-        usdOtio.track.Track: a valid usdOtio Track.
+        usdotio.track.Track: a valid usdOtio Track.
         """
         # We need to use importlib to avoid cyclic dependencies
-        track_module = importlib.import_module("usdOtio.track")
+        track_module = importlib.import_module("usdotio.track")
         return track_module.Track()

@@ -25,7 +25,7 @@ import json
 
 import opentimelineio as otio
 
-from usdOtio.composition import Composition
+from usdotio.composition import Composition
 
 class Stack(Composition):
     """Class used to define a Stack.

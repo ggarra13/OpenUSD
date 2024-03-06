@@ -23,8 +23,8 @@
 
 import json
 
-from usdOtio.named_base import NamedBase
-from usdOtio.time_range_mixin import TimeRangeMixin
+from usdotio.named_base import NamedBase
+from usdotio.time_range_mixin import TimeRangeMixin
 
 class Marker(NamedBase, TimeRangeMixin):
     """Class defining a marker (an annotation in the timeline/track/item).

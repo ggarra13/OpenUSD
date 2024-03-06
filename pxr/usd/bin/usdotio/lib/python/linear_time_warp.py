@@ -21,7 +21,7 @@
 # language governing permissions and limitations under the Apache License.
 #
 
-from usdOtio.effect import Effect
+from usdotio.effect import Effect
 
 class LinearTimeWarp(Effect):
     """Class defining a LinearTimeWarp effect.

@@ -21,7 +21,7 @@
 # language governing permissions and limitations under the Apache License.
 #
 
-from usdOtio.named_base import NamedBase
+from usdotio.named_base import NamedBase
 
 class Effect(NamedBase):
     def to_usd(self, stage, usd_path):

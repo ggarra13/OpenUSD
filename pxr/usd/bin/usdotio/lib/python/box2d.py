@@ -23,8 +23,8 @@
 
 import json
 
-from usdOtio.base import Base
-from usdOtio.v2d import V2d
+from usdotio.base import Base
+from usdotio.v2d import V2d
 
 class Box2d(Base):
     """Class used to define an Imath::Box2d.

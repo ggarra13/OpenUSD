@@ -23,7 +23,7 @@
 
 import json
 
-from usdOtio.media_reference import MediaReference
+from usdotio.media_reference import MediaReference
 
 class MissingReference(MediaReference):
     """Class defining a missing reference (ie. one that could not be loaded?)

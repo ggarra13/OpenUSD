@@ -54,16 +54,16 @@ Please run:
     exit(1)
 
 #
-# usdOtio helper classes' imports here
+# usdotio helper classes' imports here
 #
-from usdOtio.clip import Clip
-from usdOtio.gap import Gap
-from usdOtio.options import Options, LogLevel
-from usdOtio.stack import Stack
-from usdOtio.timeline import Timeline
-from usdOtio.transition import Transition
-from usdOtio.track import Track
-from usdOtio.effect import Effect
+from usdotio.clip import Clip
+from usdotio.gap import Gap
+from usdotio.options import Options, LogLevel
+from usdotio.stack import Stack
+from usdotio.timeline import Timeline
+from usdotio.transition import Transition
+from usdotio.track import Track
+from usdotio.effect import Effect
     
 class UsdOtioSave:
     """Class used to save (extract) an OpenTimelineIO (.otio) file from an
