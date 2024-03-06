@@ -88,7 +88,7 @@ Check PATH on Windows.
 #
 # usdotio imports
 #
-from usdotio.options import Options, LogLevel
+from usdotio.schema.options import Options, LogLevel
 from usdotio.usdotioadd import UsdOtioAdd
 from usdotio.usdotiosave import UsdOtioSave
 

@@ -57,15 +57,15 @@ Please run:
 #
 # usdotio helper classes' imports here
 #
-from usdotio.options import Options, LogLevel
-from usdotio.clip import Clip
-from usdotio.gap import Gap
-from usdotio.stack import Stack
-from usdotio.timeline import Timeline
-from usdotio.transition import Transition
-from usdotio.track import Track
-from usdotio.effect import Effect
-from usdotio.linear_time_warp import LinearTimeWarp
+from usdotio.schema.options import Options, LogLevel
+from usdotio.schema.clip import Clip
+from usdotio.schema.gap import Gap
+from usdotio.schema.stack import Stack
+from usdotio.schema.timeline import Timeline
+from usdotio.schema.transition import Transition
+from usdotio.schema.track import Track
+from usdotio.schema.effect import Effect
+from usdotio.schema.linear_time_warp import LinearTimeWarp
 
     
 class UsdOtioAdd:
