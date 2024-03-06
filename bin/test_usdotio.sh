@@ -11,11 +11,13 @@ test_usdotio()
     otio_cat=/tmp/orig_cat.otio
     otio_out_cat=/tmp/new_cat.otio
 
+    echo
     echo "Creating ${usd_out}"
-    usdotio add -o "${usd_out}" "${otio}" "${usd}" -y
+    usdotio add -o "${usd_out}" "${otio}" "${usd}" -y -n
     
     rm -f "${otio_out}"
 
+    echo
     echo "Comparing ${otio_out} ${otio}"
     usdotio save "${otio_out}" "${usd_out}"
 
@@ -47,7 +49,7 @@ for i in *.otio; do
     test_usdotio $i ~/assets/sphere.usda
 done
 
-cd ~/code/applications/mrv2/tlRender/etc/SampleData
+cd ~/code/applications/tlRender/etc/SampleData
 for i in *.otio; do
     test_usdotio $i ~/assets/sphere.usda
 done
