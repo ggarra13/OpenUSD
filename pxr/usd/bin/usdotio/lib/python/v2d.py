@@ -26,7 +26,11 @@ import json
 from usdOtio.base import Base
 
 class V2d(Base):
+    """Class used to parse an Imath::V2d
 
+    """
+
+    
     FILTER_KEYS = [
         'x',
         'y',
@@ -41,8 +45,8 @@ class V2d(Base):
                 'y' : 0
             }
     
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(RationalTime.FILTER_KEYS)
         
     def from_usd(self, usd_prim):
@@ -51,10 +55,10 @@ class V2d(Base):
     
     def to_usd(self, stage, usd_path):
         usd_prim = stage.DefinePrim(usd_path, 'OtioV2d')
-        self._set_usd_attributes(usd_prim)
+        self.set_usd_attributes(usd_prim)
         return usd_prim
     
-    def _set_usd_attributes(self, usd_prim):   
+    def set_usd_attributes(self, usd_prim):   
         attr = usd_prim.GetAttribute('x')
         attr.Set(self.jsonData['x'])
         

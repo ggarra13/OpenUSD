@@ -26,7 +26,8 @@ import json
 from usdOtio.base import Base
 
 class RationalTime(Base):
-    
+    """Class defining a RationalTime (value/ratio).
+    """
     def __init__(self, json_data = None):
         if json_data:
             self.jsonData = json_data.copy()
@@ -37,18 +38,18 @@ class RationalTime(Base):
             }
         
     def from_usd(self, usd_prim):
-        self._get_usd_attributes(usd_prim)
+        self.get_usd_attributes(usd_prim)
         return self.jsonData
     
     def to_usd(self, stage, usd_path):
         usd_prim = super()._create_usd(stage, usd_path, 'OtioRationalTime')
         return usd_prim
     
-    def _set_usd_attributes(self, usd_prim):   
+    def set_usd_attributes(self, usd_prim):   
         attr = usd_prim.GetAttribute('value')
         attr.Set(self.jsonData['value'])
         
         attr = usd_prim.GetAttribute('rate')
         attr.Set(self.jsonData['rate'])
 
-        super()._set_usd_attributes(usd_prim)
+        super().set_usd_attributes(usd_prim)

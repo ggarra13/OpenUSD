@@ -27,7 +27,6 @@ from usdOtio.named_base import NamedBase
 from usdOtio.options import Options
 from usdOtio.rational_time_mixin import RationalTimeMixin
 from usdOtio.stack import Stack
-from usdOtio.track import Track
 
 class Timeline(NamedBase, RationalTimeMixin):
 
@@ -43,8 +42,8 @@ class Timeline(NamedBase, RationalTimeMixin):
         if otio_item:
             self.global_start_time = self.jsonData['global_start_time']
             
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(Timeline.FILTER_KEYS)
     
     def from_usd(self, usd_prim):
@@ -53,18 +52,18 @@ class Timeline(NamedBase, RationalTimeMixin):
         #
         # Traverse the stage to get the jsonData of each node
         #
-        for x in usd_prim.GetChildren():
-            usd_type = x.GetTypeName()
+        for child in usd_prim.GetChildren():
+            usd_type = child.GetTypeName()
             if usd_type == 'OtioStack':
                 stack_prim = Stack()
-                self.jsonData['tracks'] = stack_prim.from_usd(x)
+                self.jsonData['tracks'] = stack_prim.from_usd(child)
             elif usd_type == 'OtioRationalTime': 
                 self.jsonData['global_start_time'] = \
-                    self._create_rational_time(x)
-                continue
+                    self._create_rational_time(child)
             else:
-                print(f'WARNING: (timeline.py) Unknown node attached to {usd_prim}!')
-                continue
+                if Options.log_level >= LogLevel.NORMAL:
+                    print('WARNING: (timeline.py) Unknown node', child,
+                          'attached to', usd_prim, '.')
 
         return self.to_json_string()
     
@@ -76,7 +75,7 @@ class Timeline(NamedBase, RationalTimeMixin):
         return usd_prim
 
 
-    def _set_usd_attributes(self, usd_prim):
+    def set_usd_attributes(self, usd_prim):
         #
         # Check if data is not empty
         #
@@ -84,10 +83,10 @@ class Timeline(NamedBase, RationalTimeMixin):
         attr = usd_prim.GetAttribute('OTIO_SCHEMA')
         old_data = attr.Get()
         if old_data and old_data != '':
-            print(f'\n\nWARNING: json data for {self.item_otio} is not empty:')
-            print(f'{old_data[:256]}...')
+            print('WARNING: OpenTimelineIO data for',usd_prim,'is not empty:')
+            print('OTIO_SCHEMA is',old_data)
             Options.continue_prompt()
 
-        super()._set_usd_attributes(usd_prim)
+        super().set_usd_attributes(usd_prim)
 
         

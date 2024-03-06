@@ -27,7 +27,10 @@ from usdOtio.base import Base
 from usdOtio.v2d import V2d
 
 class Box2d(Base):
+    """Class used to define an Imath::Box2d.
+    """
 
+    
     FILTER_KEYS = [
         'min',
         'max',
@@ -39,16 +42,16 @@ class Box2d(Base):
     def to_json_string(self):
         return self.jsonData
 
-    def _filter_keys(self):
-        super()._filter_keys()
-        self._remove_keys(Box2D.FILTER_KEYS)
+    def filter_attributes(self):
+        super().filter_attributes()
+        self._remove_keys(Box2d.FILTER_KEYS)
         
     def from_usd(self, usd_prim):
         for x in usd_prim.GetChildren():
-            usd_name = x.GetName()
             usd_type = x.GetTypeName()
             if usd_type == 'OtioV2d':
                 time = RationalTime()
+                usd_name = x.GetName()
                 self.jsonData[usd_name] = time.from_usd(x)
             else:
                 print(f'WARNING: (box2d.py) Unknown node {usd_type} for '
@@ -68,7 +71,3 @@ class Box2d(Base):
         vmax_prim = vmax.to_usd(stage, vmax_path)
         
         return usd_prim
-
-    def _filter_keys(self):
-        super()._filter_keys()
-        self._remove_keys(Box2d.FILTER_KEYS)

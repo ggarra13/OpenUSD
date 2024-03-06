@@ -25,11 +25,26 @@ import json
 
 import pxr
 
-from usdOtio.options import Options, Verbose
+from usdOtio.options import Options, LogLevel
 
 class Base:
+    """Base abstract class.  Derived classes may override many of its
+    methods.  At the very least, a concrete class should override
+    to_usd().
+
+    The usdOtion schema defines an 'unknown' attribute which is used to
+    be compatible with potential new parameters that the schema does not
+    support.
+
+    """
 
     def __init__(self, otio_item = None):
+        """Constructor.
+
+        Args:
+        otio_item (otio.schema.*): A valid otio.schema or None
+        
+        """
         self.jsonData = {}
         self.otio_item = otio_item
         self.usd_prim  = None
@@ -37,23 +52,74 @@ class Base:
             self.from_json_string(otio_item.to_json_string())
         
     def from_json_string(self, s):
+        """Load our internal dictionary from a JSON string.
+
+        Args:
+        s (str): A valid JSON string.
+
+        Returns:
+        None
+
+        """
+
         self.jsonData = json.loads(s)
         
     def to_json_string(self):
+        """Returns our internal dictionary as a valid JSON string.
+
+        Args:
+        None
+
+        Returns:
+        str: A JSON string
+
+        """
+
         return json.dumps(self.jsonData)
 
     def from_usd(self, usd_prim):
-        self._get_usd_attributes(usd_prim)
+        """Convert an OTIO USD GPrim to our internal directionary.
+
+        Args:
+        usd_prim (GPrim): A valid USD GPrim.
+
+        Returns:
+        dict: A copy of the internal jsonData.
+
+        """
+
+        self.get_usd_attributes(usd_prim)
         return self.jsonData
 
     def to_usd(self, stage, usd_path):
+        """Given a stage and a usd_path, subclasses should call
+        _create_usd() with the actual OTIO type for the class.
+
+
+        Args:
+        usd_prim (GPrim): A valid USD GPrim.
+
+        Returns:
+        None
+
+        """
+
         pass
     
-    def _filter_keys(self):
-        pass
-    
-    def _set_usd_attribute(self, usd_prim, key, value):
-        if Options.verbose >= Verbose.VERBOSE:
+    def set_usd_attribute(self, usd_prim, key, value):
+        """Sets an attribute in the USD primitive.
+
+        Args:
+        usd_prim (GPrim): A valid USD GPrim.
+        key (str): key to set the value for.
+        value:     value to set, can be bool, str, or dict 
+
+        Returns:
+        None
+
+        """
+
+        if Options.log_level >= LogLevel.VERBOSE:
             print(f'\t\tSetting {key} = {value}')
         attr = usd_prim.GetAttribute(key)
         if isinstance(value, dict):
@@ -65,7 +131,7 @@ class Base:
             attr.Set(value)
         except pxr.Tf.ErrorException:
             usd_type = usd_prim.GetTypeName()
-            if Options.verbose >= Verbose.VERBOSE:
+            if Options.log_level >= LogLevel.VERBOSE:
                 print(f'WARNING: Unknown attribute {key} for {usd_type} at')
                 print(f'{usd_prim}')
                 print(f'Valid Properties:')
@@ -77,52 +143,107 @@ class Base:
             if isinstance(unknown, str):
                 unknown_dict = json.loads(unknown)
                 unknown_dict[key] = value
-                self._set_usd_attribute(usd_prim, 'unknown', unknown_dict)
-            
-    def _set_usd_attributes(self, usd_prim):
-        self._filter_keys()
+                self.set_usd_attribute(usd_prim, 'unknown', unknown_dict)
+    
+    def set_usd_attributes(self, usd_prim):
+        """Sets all USD attributes from a given string taking them
+        from the internal dict.
+
+        Args:
+        usd_prim (GPrim): A valid USD prim.
+
+        Returns:
+        None
+
+        """
+
+        self.filter_attributes()
         
         if self.jsonData and len(self.jsonData) > 0:
             for key, val in self.jsonData.items():
-                self._set_usd_attribute(usd_prim, key, val)
-    
-    def _get_usd_attribute(self, usd_prim, key):
+                self.set_usd_attribute(usd_prim, key, val)
+            
+    def get_usd_attribute(self, usd_prim, key):
+        """Get a USD attribute from a GPrim and stores it in
+        our internal dictionary.
+
+        Args:
+        usd_prim (GPrim): A valid USD prim.
+        key (str): Attribute name.
+
+        Returns:
+        None
+
+        """
+        
         val = usd_prim.GetAttribute(key).Get()
         self.jsonData[key] = val
         
-    def _get_usd_attributes(self, usd_prim):
+    def get_usd_attributes(self, usd_prim):
+        """Get all USD attributes from a USD GPrim.
+        Note that if it there is an "unknown" attribute, it
+        is expanded to new key/value pairs and deleted.
+
+        Args:
+        usd_prim (GPrim): A valid USD prim.
+
+        Returns:
+        None
+        """
+
         attrs = usd_prim.GetPropertyNames()
         for attr in attrs:
+            #
+            # 'unknown' attribute is special.
+            #
             if attr == 'unknown':
                 continue
-            self._get_usd_attribute(usd_prim, attr)
+            self.get_usd_attribute(usd_prim, attr)
 
-        self._get_usd_attribute(usd_prim, 'unknown')
+
+        #
+        # Deal with the special unknown attr.
+        #
+        # We assume it is a JSON string, which we load
+        # and merge with the current keys.
+        #
+        self.get_usd_attribute(usd_prim, 'unknown')
         unknown = self.jsonData['unknown']
         if unknown and len(unknown) > 0:
-            unknown_dict = json.loads(unknown)
-            for key, val in unknown_dict.items():
-                if key == 'unknown':
-                    continue
-                if Options.verbose >= Verbose.DEBUG: 
-                    print(f'\tGetting {key} = {val})')
-                self.jsonData[key] = val
+            self.jsonData.merge(json.loads(unknown))
 
         del self.jsonData['unknown']
-         
-    def _report(self, usd_prim, usd_path):
-        if Options.verbose >= Verbose.INFO:
-            prim_type = usd_prim.GetTypeName()
-            print(f'\tCreated {prim_type} at {usd_path}')
 
+        
+    def filter_attributes(self):
+        """Subclasses should override this method to filter the
+        attributes from the interanl dictionary that should be handled
+        specially, like "children" or "tracks".
+
+        Returns:
+        None
+
+        """
+
+        pass
+    
     def _remove_keys(self, keys):
+        """Remove a list of keys from our internal dictionary
+
+        Args:
+        keys (list): list of str keys.
+
+        Returns:
+        None
+
+        """
         for key in keys:
             self.jsonData.pop(key, None)
 
     def _create_usd(self, stage, usd_path, usd_type):
         usd_prim = stage.DefinePrim(usd_path, usd_type)
-        if Options.verbose >= Verbose.INFO:
-            print(f'Created {usd_prim}')
-        self._set_usd_attributes(usd_prim)
-        self._report(usd_prim, usd_path)
+        self.set_usd_attributes(usd_prim)
+        if Options.log_level >= LogLevel.INFO:
+            prim_type = usd_prim.GetTypeName()
+            print(f'Created {prim_type} at {usd_path}')
         return usd_prim

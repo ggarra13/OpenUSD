@@ -24,10 +24,16 @@
 import json
 
 from usdOtio.base       import Base
-from usdOtio.options    import Options, Verbose
+from usdOtio.options    import Options, LogLevel
 
 class NamedBase(Base):
 
+    """Base abstract class that handles metadata.  
+       Derived classes may override many of its methods.  
+       At the very least, a concrete class should override to_usd().
+
+    """
+    
     FILTER_KEYS = [
         'metadata',
     ]
@@ -49,34 +55,50 @@ class NamedBase(Base):
         else:
             self.name = self.__class__.__name__
 
-    def _filter_keys(self):
+    def filter_attributes(self):
         """Filter the attributes for this abstract class and its children
         classes.
+
+        Args:
+        None
+
+        Returns:
+        None
+
         """
 
-        super()._filter_keys()
+        super().filter_attributes()
         self._remove_keys(NamedBase.FILTER_KEYS)
 
-    def _set_usd_attributes(self, usd_prim):
+    def set_usd_attributes(self, usd_prim):
         """Sets the attributes for this abstract class and its
 
         Args:
-        arg1 (type): Description of arg1
+        usd_prim (GPrim): A valid USD primitive.
 
         Returns:
-        return_type: Description of the return value
-
-        Raises:
-        Exception: Description of when this exception can be raised
+        None
 
         """
 
-        self._set_usd_attribute(usd_prim, 'metadata', self.metadata)
+        self.set_usd_attribute(usd_prim, 'metadata', self.metadata)
         
-        super()._set_usd_attributes(usd_prim)
+        super().set_usd_attributes(usd_prim)
 
-    def _get_usd_attributes(self, usd_prim):
-        super()._get_usd_attributes(usd_prim)
+    def get_usd_attributes(self, usd_prim):
+        """Gets the special USD attributes for a GPrim.
+
+        Currently, it handles dealing with "metadata" properly.
+
+        Args:
+        usd_prim (GPrim): A valid USD primitive.
+
+        Returns:
+        None
+
+        """
+
+        super().get_usd_attributes(usd_prim)
 
         # Convert the metadata string into an actual dict
         metadata = self.jsonData.get('metadata')
@@ -86,5 +108,6 @@ class NamedBase(Base):
             except json.JSONDecodeError as e:
                 # Handle the error if JSON decoding fails
                 print(f"Error decoding JSON: {e}")
+                self.jsonData['metadata'] = {}
         else:
             self.jsonData['metadata'] = {}

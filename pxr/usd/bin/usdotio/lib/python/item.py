@@ -23,7 +23,6 @@
 
 import json
 
-from usdOtio.box2d import Box2d
 from usdOtio.composable import Composable
 from usdOtio.effect import Effect
 from usdOtio.linear_time_warp import LinearTimeWarp
@@ -31,7 +30,18 @@ from usdOtio.marker import Marker
 from usdOtio.time_range_mixin import TimeRangeMixin
 
 class Item(Composable, TimeRangeMixin):
+    """Base abstract class for Items.  It handles "effects",
+    "markers" and "source_range" if present.
 
+    Derived classes are expected to override to_usd().
+    And derived classes that have additional special attributes
+    might need to override also from_usd(). 
+
+    See: usdOtio.clip.Clip.
+
+    """
+
+    
     FILTER_KEYS = [
         'effects',
         'markers',
@@ -49,8 +59,8 @@ class Item(Composable, TimeRangeMixin):
     def append_marker(self, marker):
         self.markers.append(marker)
 
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(Item.FILTER_KEYS)
         
     def from_json_string(self, s):
@@ -64,25 +74,21 @@ class Item(Composable, TimeRangeMixin):
         #
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
-            usd_name = x.GetName()
             if usd_type == 'OtioTimeRange':
+                usd_name = x.GetName()
                 self.jsonData[usd_name] = self._create_time_range(x)
             elif usd_type == 'OtioLinearTimeWarp':
-                tw_prim = LinearTimeWarp()
-                tw_prim.from_usd(x)
-                self.append_effect(tw_prim)
-            elif usd_type == 'OtioMarker':
-                marker_prim = Marker()
-                marker_prim.from_usd(x)
-                self.append_marker(marker_prim)
-            elif usd_type == 'OtioLinearTimeWarp':
-                tw_prim = LinearTimeWarp()
-                tw_prim.from_usd(x)
-                self.append_effect(effect_prim)
+                timewarp_prim = LinearTimeWarp()
+                timewarp_prim.from_usd(x)
+                self.append_effect(timewarp_prim)
             elif usd_type == 'OtioEffect':
                 effect_prim = Effect()
                 effect_prim.from_usd(x)
                 self.append_effect(effect_prim)
+            elif usd_type == 'OtioMarker':
+                marker_prim = Marker()
+                marker_prim.from_usd(x)
+                self.append_marker(marker_prim)
             else:
                 pass
         

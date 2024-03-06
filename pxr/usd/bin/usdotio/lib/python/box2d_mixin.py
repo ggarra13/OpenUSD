@@ -22,7 +22,7 @@
 #
 
 
-from usdOtio.options import Options, Verbose
+from usdOtio.options import Options, LogLevel
 from usdOtio.box2d import Box2d
 
 class Box2dMixin:
@@ -33,7 +33,7 @@ class Box2dMixin:
             box2d_path = usd_path + f'/{name}'
             box2d_prim = Box2d(json_data)
             box2d_prim.to_usd(stage, box2d_path)
-            if Options.verbose == Verbose.DEBUG:
+            if Options.log_level == LogLevel.DEBUG:
                 print(f'\t\tCreated time box2d at {box2d_path}')
 
         return box2d_prim

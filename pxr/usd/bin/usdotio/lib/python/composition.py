@@ -21,8 +21,114 @@
 # language governing permissions and limitations under the Apache License.
 #
 
+import json, importlib
 
+from usdOtio.clip import Clip
+from usdOtio.gap import Gap
 from usdOtio.item import Item
+from usdOtio.options import Options, LogLevel
+from usdOtio.rational_time_mixin import RationalTimeMixin
+from usdOtio.time_range_mixin import TimeRangeMixin
+from usdOtio.transition import Transition
 
-class Composition(Item):
-    pass
+class Composition(Item, TimeRangeMixin, RationalTimeMixin):
+    """Abstract class to handle a composition (ie. one that can hold Track,
+    Stack, Clip, Marker in its "children" attribute)
+
+    """
+
+    FILTER_KEYS = [
+        'children',
+    ]
+    
+    def __init__(self, otio_item = None):
+        super().__init__(otio_item)
+        self.children = []
+
+        
+    def append_child(self, child):
+        """Append a child to this Composition.
+
+        Args:
+        child (usdOtio): usdOtio class to append, like usdOtio.clip.Clip
+
+        Returns:
+        None
+
+        """
+        self.children.append(child)
+
+    def from_usd(self, usd_prim):
+        super().from_usd(usd_prim)
+        
+        #
+        # Traverse the stage to get the jsonData of each node
+        #
+        for child in usd_prim.GetChildren():
+            usd_type = child.GetTypeName()
+            child_prim = None
+            if usd_type == 'OtioTrack':
+                child_prim = self._create_track()
+            elif usd_type == 'OtioStack':
+                child_prim = self._create_stack()
+            elif usd_type == 'OtioClip':
+                child_prim = Clip()
+            elif usd_type == 'OtioGap':
+                child_prim = Gap()
+            elif usd_type == 'OtioTransition':
+                child_prim = Transition()
+            elif usd_type == 'OtioRationalTime':
+                time_prim = RationalTime()
+                usd_name = child.GetName()
+                self.jsonData[usd_name] = time_prim.from_usd(child)
+                continue
+            elif usd_type == 'OtioTimeRange':
+                range_prim = TimeRange()
+                usd_name = child.GetName()
+                self.jsonData[usd_name] = range_prim.from_usd(child)
+                continue
+            else:
+                if Options.log_level >= LogLevel.NORMAL:
+                    print('WARNING: (composition.py) Unknown child element ', \
+                          child, 'attached to', child_prim, '.')
+
+            if child_prim:
+                child_prim.from_usd(child)
+                self.append_child(child_prim)
+        
+        json_strings = [json.loads(x.to_json_string()) for x in self.children]
+        self.jsonData['children'] = json_strings
+        
+        return self.jsonData
+
+
+    def filter_attributes(self):
+        super().filter_attributes()
+        self._remove_keys(Composition.FILTER_KEYS)
+
+        
+    def _create_stack(self):
+        """An auxiliary class to create a Stack.
+        
+        Args:
+        None
+
+        Returns:
+        usdOtio.stack.Stack: a valid usdOtio Stack.
+        """
+        # We need to use importlib to avoid cyclic dependencies
+        stack_module = importlib.import_module("usdOtio.stack")
+        return stack_module.Stack()
+
+    def _create_track(self):
+        """An auxiliary class to create a Track.
+        
+        Args:
+        None
+
+        Returns:
+        usdOtio.track.Track: a valid usdOtio Track.
+        """
+        # We need to use importlib to avoid cyclic dependencies
+        track_module = importlib.import_module("usdOtio.track")
+        return track_module.Track()

@@ -20,6 +20,8 @@
 # KIND, either express or implied. See the Apache License for the specific
 # language governing permissions and limitations under the Apache License.
 #
+
+
 #
 # Normal python imports
 #
@@ -55,7 +57,7 @@ Please run:
 #
 # usdOtio helper classes' imports here
 #
-from usdOtio.options import Options, Verbose
+from usdOtio.options import Options, LogLevel
 from usdOtio.clip import Clip
 from usdOtio.gap import Gap
 from usdOtio.stack import Stack
@@ -67,13 +69,33 @@ from usdOtio.linear_time_warp import LinearTimeWarp
 
     
 class UsdOtioAdd:
+    """A class to add an .otio (OpenTimelineIO) file to a .usd file.
+    """
+
     def __init__(self, usd_file, otio_file, output_file, path = '/',
                  comment = True):
+        """Constructor
+
+        Args:
+        usd_file (str): A valid .usd file.
+        otio_file (str): A valid OpenTimelineIO file (or one that adaptors
+                         accept).
+        output_file (str): Name of the output .usd file.
+        path (str): USD path to attach the otio information to.
+        comment (bool): Whether the output .usd file has a comment at the 
+                        beginning.  For unit tests, you will want to
+                        disable the comments.
+        """
+
+        #
+        # Store these for easy access.
+        #
         self.usd_file = usd_file
         self.otio_file = otio_file
         self.output_file = output_file
         self.path = path
         self.comment = not comment
+
         #
         # Initialize some counters
         #
@@ -96,7 +118,7 @@ class UsdOtioAdd:
             
         usd_effect_item.to_usd(stage, usd_path)
 
-    def parse_effects(self, stage, usd_path, effects):
+    def process_effects(self, stage, usd_path, effects):
         for effect in effects:
             self.create_effect(stage, usd_path, effect)
             self.effect_index += 1
@@ -131,14 +153,14 @@ class UsdOtioAdd:
             usd_item.to_usd(stage, usd_path)
 
             if can_have_effects:
-                self.parse_effects(stage, usd_path, child.effects)
+                self.process_effects(stage, usd_path, child.effects)
                     
     def recurse_track(self, stage, track_path, track):
         for child in track:
             self.process_child(stage, track_path, child)
 
         if track.effects:
-            self.parse_effects(stage, track_path, track.effects)
+            self.process_effects(stage, track_path, track.effects)
 
     def recurse_stack(self, stage, stack_path, stack):
         for child in stack:
@@ -150,7 +172,7 @@ class UsdOtioAdd:
                     track_path = stack_path + f'/Audio_{self.audio_track_index}'
                     self.audio_track_index += 1
                 else:
-                    if Options.verbose >= Verbose.WARNING:
+                    if Options.log_level >= LogLevel.WARNING:
                         print(f'Unknown track type {child}!')
                     continue
                 track_item = Track(child)
@@ -227,17 +249,20 @@ Valid OtioTimeline primitives in stage:''')
         # Export modified stage to output file
         #
         if self.output_file == self.usd_file:
-            print('WARNING: Saving over original USD file.')
-            Options.continue_prompt()
+            if Options.log_level >= LogLevel.NORMAL:
+                print('WARNING: Saving over original USD file.')
+                Options.continue_prompt()
         else:
             #
             # Check if otio file already exists
             #
             if os.path.isfile(self.output_file):
-                if Options.verbose >= Verbose.NORMAL:
+                if Options.log_level >= LogLevel.NORMAL:
                     print(f'"{self.otio_file}" already exists!  '
                           'Will overwrite it.')
                     Options.continue_prompt()
                 
 
         stage.Export(self.output_file, addSourceFileComment=self.comment)
+        if Options.log_level >= LogLevel.NORMAL:
+            print(f'Saved "{self.output_file}".')

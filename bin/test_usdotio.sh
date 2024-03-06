@@ -11,26 +11,25 @@ test_usdotio()
     otio_cat=/tmp/orig_cat.otio
     otio_out_cat=${otio_out}
 
-    echo
     echo "Creating ${usd_out}"
     usdotio add -o "${usd_out}" "${otio}" "${usd}" -y -n -v quiet
     
     rm -f "${otio_out}"
-
-    echo
-    echo "Comparing ${otio_out} ${otio}"
+    
     usdotio save "${otio_out}" "${usd_out}" -v quiet
 
     otiocat "${otio}" > "${otio_cat}"
 
+    echo -n "Testing ${otio_out} ${otio} ....."
     error=`diff -w ${otio_cat} ${otio_out_cat}`
     if [[ "${error}" != "" ]]; then
+	echo "FAILED"
 	echo "usd file ${usd_out}"
 	echo "${otio}" "${otio_out}"
 	meld "${otio_cat}" "${otio_out_cat}"
 	exit 1
     else
-	echo "MATCHING FILES"
+	echo "PASSED"
     fi
 }
 

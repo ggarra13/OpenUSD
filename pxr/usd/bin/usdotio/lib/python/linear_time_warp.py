@@ -24,6 +24,8 @@
 from usdOtio.effect import Effect
 
 class LinearTimeWarp(Effect):
+    """Class defining a LinearTimeWarp effect.
+    """
         
     def to_usd(self, stage, usd_path):
         usd_prim = self._create_usd(stage, usd_path, 'OtioLinearTimeWarp')

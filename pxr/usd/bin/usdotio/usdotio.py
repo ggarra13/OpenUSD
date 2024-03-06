@@ -88,7 +88,7 @@ Check PATH on Windows.
 #
 # usdOtio imports
 #
-from usdOtio.options import Options, Verbose
+from usdOtio.options import Options, LogLevel
 from usdOtio.usdotioadd import UsdOtioAdd
 from usdOtio.usdotiosave import UsdOtioSave
 
@@ -165,7 +165,7 @@ class UsdOtio:
         with open(self.otio_file, 'w') as f:
             f.write(json_data)
 
-        if Options.verbose:
+        if Options.log_level:
             print('Extracted:\n\n', json_data)
     
     @staticmethod
@@ -189,7 +189,7 @@ class UsdOtio:
         Parses the verbosity level argument, handling both enum names and integers.
         """
         try:
-            return Verbose[value.upper()]  # Try converting to enum member by name
+            return LogLevel[value.upper()]  # Try converting to enum member by name
         except KeyError:
             try:
                 return int(value)  # Fallback to integer conversion
@@ -224,10 +224,10 @@ class UsdOtio:
         #
         add_parser = subparsers.add_parser('add', help='Add mode')
         add_parser.add_argument('-v', '--log', nargs='?',
-                                default=Verbose.NORMAL, dest='verbose',
+                                default=LogLevel.NORMAL, dest='verbose',
                                 type=self.parse_verbosity,
                                 help='Set verbosity level: ' \
-                                'debug verbose info normal quiet ' \
+                                'debug trace verbose info normal quiet ' \
                                 'or integer value')
         add_parser.add_argument('-y', '--yes', action='store_true',
                                 help='Answer yes to all questions')
@@ -253,10 +253,10 @@ class UsdOtio:
         #
         save_parser = subparsers.add_parser('save', help='Save mode')
         save_parser.add_argument('-v', '--log', nargs='?',
-                                 default=Verbose.NORMAL, dest='verbose',
+                                 default=LogLevel.NORMAL, dest='verbose',
                                  type=self.parse_verbosity,
                                  help='Set verbosity level: ' \
-                                 'debug verbose info normal quiet ' \
+                                 'debug trace verbose info normal quiet ' \
                                  'or integer value')
         save_parser.add_argument('-y', '--yes', action='store_true',
                                  help='Answer yes to all questions')
@@ -278,10 +278,10 @@ class UsdOtio:
         #
         v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
         v2_parser.add_argument('-v', '--log', nargs='?',
-                               default=Verbose.NORMAL, dest='verbose',
+                               default=LogLevel.NORMAL, dest='verbose',
                                type=self.parse_verbosity,
                                  help='Set verbosity level: ' \
-                                 'debug verbose info normal quiet ' \
+                                 'debug trace verbose info normal quiet ' \
                                  'or integer value')
         v2_parser.add_argument('-y', '--yes', action='store_true',
                                help='Answer yes to all questions')
@@ -306,7 +306,7 @@ class UsdOtio:
             print(parser.format_help())
             exit(1)
             
-        Options.verbose = args.verbose
+        Options.log_level = args.verbose
         Options.yes = args.yes
         self.usd_file = args.usd_file
 
@@ -321,14 +321,14 @@ class UsdOtio:
         if not self.output_file:
             self.output_file = self.usd_file
         
-        if Options.verbose == Verbose.DEBUG:
-            print('Verbose mode enabled!')
+        if Options.log_level == LogLevel.DEBUG:
+            print('LogLevel mode enabled!')
             print('\nEnvironment:\n')
             print(f'PXR_PLUGINPATH_NAME={os.environ["PXR_PLUGINPATH_NAME"]}')
             print('')
             print(f'sys.path={os.path.pathsep.join(sys.path)}')
             
-        if Options.verbose >= Verbose.NORMAL.value:
+        if Options.log_level >= LogLevel.NORMAL.value:
             print(f'usdotio v{VERSION}')
             print('')
             print(f'Selected mode: {self.mode}')
@@ -364,15 +364,15 @@ class UsdOtio:
             self.path = '/otio'
                 
             if self.mode == "add":
-                if Options.verbose >= Verbose.INFO.value:
+                if Options.log_level >= LogLevel.INFO.value:
                     print(f'\nAdding "{self.otio_file}" to\n'
                           f'USD path "{self.path}" in\n'
                           f'"{self.usd_file}"...')
             if self.output_file != self.usd_file:
-                if Options.verbose >= Verbose.INFO.value:
+                if Options.log_level >= LogLevel.INFO.value:
                     print(f'\nSaving to {self.output_file}')
             elif self.mode == 'save':
-                if Options.verbose >= Verbose.INFO.value:
+                if Options.log_level >= LogLevel.INFO.value:
                     print(f'\nGetting otio data from USD path "{self.path}"...\n')
                     print(f'Saving to "{self.otio_file}"')
 

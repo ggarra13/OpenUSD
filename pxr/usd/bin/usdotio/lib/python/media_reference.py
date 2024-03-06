@@ -28,6 +28,12 @@ from usdOtio.time_range_mixin import TimeRangeMixin
 
 
 class MediaReference(NamedBase, TimeRangeMixin):
+    """Base class for media references (ie. videos, image sequences or missing
+    media.
+
+    Derived classes will need to override to_usd().
+
+    """
 
     FILTER_KEYS = [
         'available_image_bounds',
@@ -47,17 +53,20 @@ class MediaReference(NamedBase, TimeRangeMixin):
         super().from_usd(usd_prim)
 
         #
-        # Traverse the stage to get the jsonData of each node
+        # Traverse the stage to get the jsonData of each node.
+        #
+        # We should convert "available_image_bounds", but in opentimelineio
+        # it is a read-only node, so that information cannot be kept in
+        # the translation
         #
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
-            usd_name = x.GetName()
             if usd_type == 'OtioTimeRange':
+                usd_name = x.GetName()
                 self.jsonData[usd_name] = self._create_time_range(x)
             else:
-                print(f'WARNING: (media_reference.py) Unknown node {usd_type} attached to {usd_prim}!')
-                continue
+                pass
         
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(MediaReference.FILTER_KEYS)

@@ -27,7 +27,9 @@ from usdOtio.base import Base
 from usdOtio.rational_time_mixin import RationalTimeMixin
 
 class TimeRange(Base, RationalTimeMixin):
-
+    """Class holding a TimeRange.
+    """
+    
     FILTER_KEYS = [
         'start_time',
         'duration'
@@ -40,8 +42,8 @@ class TimeRange(Base, RationalTimeMixin):
     def to_json_string(self):
         return self.jsonData
 
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(TimeRange.FILTER_KEYS)
         
     def from_usd(self, usd_prim):

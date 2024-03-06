@@ -22,21 +22,45 @@
 #
 
 
-from usdOtio.options import Options, Verbose
+from usdOtio.options import Options, LogLevel
 from usdOtio.rational_time import RationalTime
 
 class RationalTimeMixin:
-    def _create_rational_time(self, usd_prim):
-        rational_time = RationalTime()
-        return rational_time.from_usd(usd_prim)
+    """Mixin class to create a RationalTime or convert it.
+    """
 
     def _set_rational_time(self, stage, usd_path, name):
-        s = self.jsonData.get(name)
+        """Set a time range in a USD Prim, extracting it from
+        the internal dictionary.
+
+        Args:
+        stage (USD Stage): A valid USD stage.
+        usd_path (str): A path to the GPrim.
+        name (str): Name of the time range attribute.
+
+        Returns:
+        RationalTime: Returns the usdOtio RationalTime or None.
+
+        """
+        json_data = self.jsonData.get(name)
 
         time_prim = None
-        if s:
+        if json_data:
             time_path = usd_path + f'/{name}'
-            time_prim = RationalTime(s)
+            time_prim = RationalTime(json_data)
             time_prim.to_usd(stage, time_path)
 
         return time_prim
+
+
+    def _create_rational_time(self, usd_prim):
+        """Create a RationalTime from a USD GPrim.
+
+        Args:
+        usd_prim (GPrim): A valid USD OtioRationalTime GPrim.
+
+        Returns:
+        dict:  JSON dict representing the OpenTimelineIO RationalTime.
+        """
+        rational_time = RationalTime()
+        return rational_time.from_usd(usd_prim)

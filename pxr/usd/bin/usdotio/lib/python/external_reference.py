@@ -26,7 +26,9 @@ import json
 from usdOtio.media_reference import MediaReference
 
 class ExternalReference(MediaReference):
-    
+    """Class that handles an external media reference, like a video.
+    """
+
     def to_usd(self, stage, usd_path):
         super().to_usd(stage, usd_path)
         usd_prim = self._create_usd(stage, usd_path, 'OtioExternalReference')

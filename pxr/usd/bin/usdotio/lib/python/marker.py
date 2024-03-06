@@ -27,6 +27,10 @@ from usdOtio.named_base import NamedBase
 from usdOtio.time_range_mixin import TimeRangeMixin
 
 class Marker(NamedBase, TimeRangeMixin):
+    """Class defining a marker (an annotation in the timeline/track/item).
+
+    """
+
     
     FILTER_KEYS = [
         'marked_range',
@@ -40,13 +44,12 @@ class Marker(NamedBase, TimeRangeMixin):
         #
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
-            usd_name = x.GetName()
             if usd_type == 'OtioTimeRange':
+                usd_name = x.GetName()
                 self.jsonData[usd_name] = self._create_time_range(x)
             else:
                 print(f'WARNING: (marker.py) Unknown node {usd_type}' \
                       f'attached to {usd_prim}!')
-                continue
         
         return self.jsonData
     
@@ -56,6 +59,6 @@ class Marker(NamedBase, TimeRangeMixin):
         usd_prim = self._create_usd(stage, usd_path, 'OtioMarker')
         return usd_prim
         
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(Marker.FILTER_KEYS)

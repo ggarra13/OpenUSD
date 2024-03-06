@@ -23,14 +23,31 @@
 
 from enum import Enum, auto
 
-class Verbose(Enum):
-    QUIET   = auto()
-    NORMAL  = auto()
-    INFO    = auto()
-    VERBOSE = auto()
-    DEBUG   = auto()
+class LogLevel(Enum):
+    """Enum class defining the verbose mode of the script.
+    """
+
+    QUIET   = auto()   # Completely silent.  Overwrites files without asking.
+    NORMAL  = auto()   # Print basic info and check for overwriting files
+    INFO    = auto()   # Basic information.
+    VERBOSE = auto()   # More detailed information.
+    TRACE   = auto()   # Lots of messages
+    DEBUG   = auto()   # Debug mode.  Lots of messages and, if using 'save'
+                       # mode, it will *NOT* use opentimelineio to save the
+                       # file.  Useful for when the otio cannot parse the
+                       # timeline
     
     def __ge__(self, other):
+        """Greater or equal comparison operator.
+
+        Args:
+        other (a LogLevel or an int): Another LogLevel or an int.
+
+        Returns:
+        bool: Whether self is higher than other
+
+        """
+
         if isinstance(other, self.__class__):
             return self.value >= other.value
         elif isinstance(other, int):
@@ -38,6 +55,9 @@ class Verbose(Enum):
         return False  # Handle non-enum comparison
 
 class Options:
+    """usdotio global Options class.
+    """
+    
     #
     # When this is True, we skip all interactive questions in the script 
     #
@@ -46,18 +66,12 @@ class Options:
     #
     #
     #
-    verbose = Verbose.NORMAL
-
-    #
-    # When this is True, we save the .otio file with python.
-    # When it is False, we save it with opentimelineio's python module.
-    #
-    debug = False
+    log_level = LogLevel.NORMAL
 
     @staticmethod
     def continue_prompt():
         """
-        Prompt user to continue or cancel.
+        Prompt user to continue or cancel, unless the -yes flag was passed in.
         """
         if Options.yes:
             return

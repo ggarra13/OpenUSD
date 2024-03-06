@@ -26,8 +26,11 @@ import json
 from usdOtio.media_reference import MediaReference
 
 class ImageSequenceReference(MediaReference):
+    """Class that handles an image sequence media reference.
+    """
 
     FILTER_KEYS = [
+        # This is an enum, but it cannot be defined as such in the schema.usda
         'missing_frame_policy',
     ]
     
@@ -40,15 +43,15 @@ class ImageSequenceReference(MediaReference):
                                    'OtioImageSequenceReference')
         return usd_prim
 
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(ImageSequenceReference.FILTER_KEYS)
 
-    def _set_usd_attributes(self, usd_prim):
+    def set_usd_attributes(self, usd_prim):
         
         # USD does not accept variant sets in schemas
         policy = self.jsonData['missing_frame_policy']
         policy = policy.removeprefix('MissingFramePolicy.')
-        self._set_usd_attribute(usd_prim, 'missing_frame_policy', policy) 
+        self.set_usd_attribute(usd_prim, 'missing_frame_policy', policy) 
         
-        super()._set_usd_attributes(usd_prim)
+        super().set_usd_attributes(usd_prim)

@@ -21,11 +21,16 @@
 # language governing permissions and limitations under the Apache License.
 #
 
+import json
+
+import opentimelineio as otio
 
 from usdOtio.named_base import NamedBase
 from usdOtio.rational_time_mixin import RationalTimeMixin
 
 class Transition(NamedBase, RationalTimeMixin):
+    """A class defining a Transition.  It defaults to a SMPTE_Dissolve.
+    """
 
     FILTER_KEYS = [
         'in_offset',
@@ -34,26 +39,26 @@ class Transition(NamedBase, RationalTimeMixin):
 
     def __init__(self, otio_item = None):
         super().__init__(otio_item)
-        if otio_item:
-            self.transition_type = otio_item.transition_type
-        else:
-            self.transition_type = 'SMPTE_Dissolve'
+        if not otio_item:
+            self.jsonData = \
+                json.loads(otio.schema.Transition().to_json_string())
         
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(Transition.FILTER_KEYS)
         
     def from_usd(self, usd_prim):
         super().from_usd(usd_prim)
         
-        for x in usd_prim.GetChildren():
-            usd_name = x.GetName()
-            usd_type = x.GetTypeName()
+        for child in usd_prim.GetChildren():
+            usd_type = child.GetTypeName()
             if usd_type == 'OtioRationalTime':
-                self.jsonData[usd_name] = self._create_rational_time(x)
+                usd_name = child.GetName()
+                self.jsonData[usd_name] = self._create_rational_time(child)
             else:
-                print(f'WARNING: (transition.py) Unknown node {usd_type} for '
-                      f'{usd_prim}')
+                if Options.log_level >= LogLevel.NORMAL:
+                    print('WARNING: (transition.py) Unknown child element ', \
+                          child, 'attached to', child, '.')
         
         return self.jsonData
     

@@ -31,7 +31,7 @@ from usdOtio.external_reference import ExternalReference
 from usdOtio.image_sequence_reference import ImageSequenceReference
 from usdOtio.item import Item
 from usdOtio.missing_reference import MissingReference
-from usdOtio.options import Options, Verbose
+from usdOtio.options import Options, LogLevel
 
 class Clip(Item, Box2dMixin):
 
@@ -43,9 +43,6 @@ class Clip(Item, Box2dMixin):
     def __init__(self, otio_item = None):
         super().__init__(otio_item)
         self.media_references = {}
-        self.enabled = True
-        if self.otio_item:
-            self.enabled = otio_item.enabled
 
     def append_media_reference(self, ref_prim, key = 'DEFAULT_MEDIA'):
         self.media_references[key] = ref_prim
@@ -116,6 +113,6 @@ class Clip(Item, Box2dMixin):
         return usd_prim
 
 
-    def _filter_keys(self):
-        super()._filter_keys()
+    def filter_attributes(self):
+        super().filter_attributes()
         self._remove_keys(Clip.FILTER_KEYS)

@@ -58,7 +58,7 @@ Please run:
 #
 from usdOtio.clip import Clip
 from usdOtio.gap import Gap
-from usdOtio.options import Options, Verbose
+from usdOtio.options import Options, LogLevel
 from usdOtio.stack import Stack
 from usdOtio.timeline import Timeline
 from usdOtio.transition import Transition
@@ -66,6 +66,10 @@ from usdOtio.track import Track
 from usdOtio.effect import Effect
     
 class UsdOtioSave:
+    """Class used to save (extract) an OpenTimelineIO (.otio) file from an
+    USD (.usd, usda, etc.) with embedded information.
+    """
+
     def __init__(self, usd_file, otio_file, usd_path = '/'):
         self.usd_file = usd_file
         self.otio_file = otio_file
@@ -128,7 +132,7 @@ Valid OtioTimeline primitives in stage:''')
         # Check if otio file already exists
         #
         if os.path.isfile(self.otio_file):
-            if Options.verbose >= Verbose.NORMAL:
+            if Options.log_level >= LogLevel.NORMAL:
                 print(f'"{self.otio_file}" already exists!  Will overwrite it.')
                 Options.continue_prompt()
             os.remove(self.otio_file)
@@ -136,11 +140,11 @@ Valid OtioTimeline primitives in stage:''')
         #
         # Write out the json data
         #
-        if Options.debug:
+        if Options.log_level == LogLevel.DEBUG:
             with open(self.otio_file, 'w') as f:
                 f.write(json_data)
                 
-            if Options.verbose >= Verbose.NORMAL:
+            if Options.log_level >= LogLevel.NORMAL:
                 print(f'''To tabulate and verify the file "{self.otio_file}" use otiocat:
 
 otiocat "${self.otio_file}" > /tmp/test.otio
@@ -148,3 +152,6 @@ otiocat "${self.otio_file}" > /tmp/test.otio
         else:
             timeline = otio.schema.Timeline.from_json_string(json_data)
             timeline.to_json_file(self.otio_file)
+
+        if Options.log_level >= LogLevel.NORMAL:
+            print(f'Saved "{self.otio_file}".')
