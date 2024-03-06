@@ -37,7 +37,7 @@ import stat
 import shutil
 
 PYTHON_DIRS = [
-    'pxr/usd/bin/usdotio/python'
+    'pxr/usd/bin/usdotio/usdOtio/python'
 ]
 
 def process_python_files():
@@ -80,7 +80,7 @@ def process_python_files():
 
                 out.write( text )
 
-            #shutil.move( f + ".new", f )
+            shutil.move( f + ".new", f )
  
 
 
