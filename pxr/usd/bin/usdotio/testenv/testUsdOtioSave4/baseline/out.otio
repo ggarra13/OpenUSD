@@ -1,1 +1,97 @@
-{"metadata": {}, "name": "", "OTIO_SCHEMA": "Timeline.1", "tracks": {"OTIO_SCHEMA": "Stack.1", "metadata": {}, "name": "tracks", "source_range": null, "effects": [], "markers": [], "enabled": true, "children": [{"enabled": true, "kind": "Video", "metadata": {}, "name": "", "OTIO_SCHEMA": "Track.1", "effects": [], "markers": [], "children": [{"active_media_reference_key": "DEFAULT_MEDIA", "enabled": true, "metadata": {}, "name": "", "OTIO_SCHEMA": "Clip.2", "effects": [], "markers": [], "media_references": {"DEFAULT_MEDIA": {"metadata": {}, "name": "", "OTIO_SCHEMA": "MissingReference.1"}}}, {"OTIO_SCHEMA": "Stack.1", "metadata": {}, "name": "", "source_range": null, "effects": [], "markers": [], "enabled": true, "children": [{"active_media_reference_key": "DEFAULT_MEDIA", "enabled": true, "metadata": {}, "name": "", "OTIO_SCHEMA": "Clip.2", "effects": [], "markers": [], "media_references": {"DEFAULT_MEDIA": {"metadata": {}, "name": "", "OTIO_SCHEMA": "MissingReference.1"}}}]}, {"active_media_reference_key": "DEFAULT_MEDIA", "enabled": true, "metadata": {}, "name": "", "OTIO_SCHEMA": "Clip.2", "effects": [], "markers": [], "media_references": {"DEFAULT_MEDIA": {"metadata": {}, "name": "", "OTIO_SCHEMA": "MissingReference.1"}}}]}]}}
+{
+    "OTIO_SCHEMA": "Timeline.1",
+    "metadata": {},
+    "name": "",
+    "global_start_time": null,
+    "tracks": {
+        "OTIO_SCHEMA": "Stack.1",
+        "metadata": {},
+        "name": "tracks",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "enabled": true,
+        "children": [
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": null,
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "MissingReference.1",
+                                "metadata": {},
+                                "name": "",
+                                "available_range": null,
+                                "available_image_bounds": null
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    },
+                    {
+                        "OTIO_SCHEMA": "Stack.1",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": null,
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "children": [
+                            {
+                                "OTIO_SCHEMA": "Clip.2",
+                                "metadata": {},
+                                "name": "",
+                                "source_range": null,
+                                "effects": [],
+                                "markers": [],
+                                "enabled": true,
+                                "media_references": {
+                                    "DEFAULT_MEDIA": {
+                                        "OTIO_SCHEMA": "MissingReference.1",
+                                        "metadata": {},
+                                        "name": "",
+                                        "available_range": null,
+                                        "available_image_bounds": null
+                                    }
+                                },
+                                "active_media_reference_key": "DEFAULT_MEDIA"
+                            }
+                        ]
+                    },
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {},
+                        "name": "",
+                        "source_range": null,
+                        "effects": [],
+                        "markers": [],
+                        "enabled": true,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "MissingReference.1",
+                                "metadata": {},
+                                "name": "",
+                                "available_range": null,
+                                "available_image_bounds": null
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            }
+        ]
+    }
+}

@@ -11,6 +11,15 @@ class NamedBase(Base):
     ]
     
     def __init__(self, otio_item = None):
+        """Constructor.
+        This abstract class handles all classes that have a name and a
+        metadata.
+
+        Args:
+        otio_item (type): Optional otio.schema.* type
+
+        """
+
         super().__init__(otio_item)
         self.metadata = json.dumps(self.jsonData.get('metadata', '{}'))
         if otio_item:
@@ -18,14 +27,28 @@ class NamedBase(Base):
         else:
             self.name = self.__class__.__name__
 
-    def from_usd(self, usd_prim):
-        return super().from_usd(usd_prim)
-    
     def _filter_keys(self):
+        """Filter the attributes for this abstract class and its children
+        classes.
+        """
+
         super()._filter_keys()
         self._remove_keys(NamedBase.FILTER_KEYS)
 
     def _set_usd_attributes(self, usd_prim):
+        """Sets the attributes for this abstract class and its
+
+        Args:
+        arg1 (type): Description of arg1
+
+        Returns:
+        return_type: Description of the return value
+
+        Raises:
+        Exception: Description of when this exception can be raised
+
+        """
+
         self._set_usd_attribute(usd_prim, 'metadata', self.metadata)
         
         super()._set_usd_attributes(usd_prim)

@@ -1,1 +1,81 @@
-{"metadata": {}, "name": "LinearTimeWarp", "OTIO_SCHEMA": "Timeline.1", "tracks": {"OTIO_SCHEMA": "Stack.1", "metadata": {}, "name": "Stack", "source_range": null, "effects": [], "markers": [], "enabled": true, "children": [{"enabled": true, "kind": "Video", "metadata": {}, "name": "Video", "OTIO_SCHEMA": "Track.1", "effects": [], "markers": [], "children": [{"active_media_reference_key": "DEFAULT_MEDIA", "enabled": true, "metadata": {}, "name": "BART_2021-02-07", "OTIO_SCHEMA": "Clip.2", "source_range": {"OTIO_SCHEMA": "TimeRange.1", "start_time": {"value": 90.0, "rate": 30.0, "OTIO_SCHEMA": "RationalTime.1"}, "duration": {"value": 90.0, "rate": 30.0, "OTIO_SCHEMA": "RationalTime.1"}}, "effects": [{"effect_name": "LinearTimeWarp", "metadata": {}, "name": "", "OTIO_SCHEMA": "LinearTimeWarp.1", "time_scalar": 0.75}], "markers": [], "media_references": {"DEFAULT_MEDIA": {"metadata": {}, "name": "", "OTIO_SCHEMA": "ExternalReference.1", "target_url": "BART_2021-02-07.m4v", "available_range": {"OTIO_SCHEMA": "TimeRange.1", "start_time": {"value": 0.0, "rate": 30.0, "OTIO_SCHEMA": "RationalTime.1"}, "duration": {"value": 704.0, "rate": 30.0, "OTIO_SCHEMA": "RationalTime.1"}}}}}]}]}}
+{
+    "OTIO_SCHEMA": "Timeline.1",
+    "metadata": {},
+    "name": "LinearTimeWarp",
+    "global_start_time": null,
+    "tracks": {
+        "OTIO_SCHEMA": "Stack.1",
+        "metadata": {},
+        "name": "Stack",
+        "source_range": null,
+        "effects": [],
+        "markers": [],
+        "enabled": true,
+        "children": [
+            {
+                "OTIO_SCHEMA": "Track.1",
+                "metadata": {},
+                "name": "Video",
+                "source_range": null,
+                "effects": [],
+                "markers": [],
+                "enabled": true,
+                "children": [
+                    {
+                        "OTIO_SCHEMA": "Clip.2",
+                        "metadata": {},
+                        "name": "BART_2021-02-07",
+                        "source_range": {
+                            "OTIO_SCHEMA": "TimeRange.1",
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 90.0
+                            },
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "rate": 30.0,
+                                "value": 90.0
+                            }
+                        },
+                        "effects": [
+                            {
+                                "OTIO_SCHEMA": "LinearTimeWarp.1",
+                                "metadata": {},
+                                "name": "",
+                                "effect_name": "LinearTimeWarp",
+                                "time_scalar": 0.75
+                            }
+                        ],
+                        "markers": [],
+                        "enabled": true,
+                        "media_references": {
+                            "DEFAULT_MEDIA": {
+                                "OTIO_SCHEMA": "ExternalReference.1",
+                                "metadata": {},
+                                "name": "",
+                                "available_range": {
+                                    "OTIO_SCHEMA": "TimeRange.1",
+                                    "duration": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 704.0
+                                    },
+                                    "start_time": {
+                                        "OTIO_SCHEMA": "RationalTime.1",
+                                        "rate": 30.0,
+                                        "value": 0.0
+                                    }
+                                },
+                                "available_image_bounds": null,
+                                "target_url": "BART_2021-02-07.m4v"
+                            }
+                        },
+                        "active_media_reference_key": "DEFAULT_MEDIA"
+                    }
+                ],
+                "kind": "Video"
+            }
+        ]
+    }
+}

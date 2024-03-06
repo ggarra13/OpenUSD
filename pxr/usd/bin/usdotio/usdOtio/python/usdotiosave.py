@@ -115,6 +115,16 @@ Valid OtioTimeline primitives in stage:''')
         if Options.debug:
             with open(self.otio_file, 'w') as f:
                 f.write(json_data)
+                
+            if Options.verbose >= Verbose.NORMAL:
+                print(f'''To tabulate and verify the file "{self.otio_file}" use otiocat:
+
+otiocat "${self.otio_file}" > /tmp/test.otio
+''')
         else:
             timeline = otio.schema.Timeline.from_json_string(json_data)
-            timeline.to_json_file(self.otio_file)
+            
+            # @bug: to_json_file() does not add a newline like otiocat does.
+            with open(self.otio_file, 'w') as f:
+                f.write(timeline.to_json_string() + '\n')
+

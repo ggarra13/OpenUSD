@@ -30,7 +30,7 @@ class Options:
     # When this is True, we save the .otio file with python.
     # When it is False, we save it with opentimelineio's python module.
     #
-    debug = True
+    debug = False
 
     @staticmethod
     def continue_prompt():
