@@ -9,20 +9,19 @@ test_usdotio()
     otio_out=/tmp/test.otio
 
     otio_cat=/tmp/orig_cat.otio
-    otio_out_cat=/tmp/new_cat.otio
+    otio_out_cat=${otio_out}
 
     echo
     echo "Creating ${usd_out}"
-    usdotio add -o "${usd_out}" "${otio}" "${usd}" -y -n
+    usdotio add -o "${usd_out}" "${otio}" "${usd}" -y -n -v quiet
     
     rm -f "${otio_out}"
 
     echo
     echo "Comparing ${otio_out} ${otio}"
-    usdotio save "${otio_out}" "${usd_out}"
+    usdotio save "${otio_out}" "${usd_out}" -v quiet
 
     otiocat "${otio}" > "${otio_cat}"
-    otiocat "${otio_out}" > "${otio_out_cat}"
 
     error=`diff -w ${otio_cat} ${otio_out_cat}`
     if [[ "${error}" != "" ]]; then
