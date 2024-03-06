@@ -131,6 +131,7 @@ Valid OtioTimeline primitives in stage:''')
             if Options.verbose >= Verbose.NORMAL:
                 print(f'"{self.otio_file}" already exists!  Will overwrite it.')
                 Options.continue_prompt()
+            os.remove(self.otio_file)
         
         #
         # Write out the json data
@@ -146,8 +147,4 @@ otiocat "${self.otio_file}" > /tmp/test.otio
 ''')
         else:
             timeline = otio.schema.Timeline.from_json_string(json_data)
-            
-            # @bug: to_json_file() does not add a newline like otiocat does.
-            with open(self.otio_file, 'w') as f:
-                f.write(timeline.to_json_string() + '\n')
-
+            timeline.to_json_file(self.otio_file)
