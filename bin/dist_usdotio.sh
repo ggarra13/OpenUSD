@@ -11,7 +11,8 @@ fi
 
 cd $ROOT
 
-rm -rf $INSTALL/lib/python/usdOtio/__pycache__
+rm -rf $INSTALL/lib/python/usdotio/__pycache__
+rm -rf $INSTALL/lib/python/usdotio/schema/__pycache__
 
 cd $INSTALL
-zip -r usdotio.zip bin/usdotio bin/usdotio.cmd lib/python/usdOtio share/usd/examples/plugin/usdOtio scripts/usdotio.bat usdOtio_README.txt
+zip -r usdotio.zip bin/usdotio bin/usdotio.cmd lib/python/usdotio share/usd/examples/plugin/usdotio scripts/usdotio.bat usdotio_README.txt
