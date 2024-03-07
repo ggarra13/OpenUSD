@@ -1,7 +1,7 @@
 set(PXR_PREFIX pxr/usd)
 set(PXR_PACKAGE usd)
 
-set(_usdOtioDirectory usdOtio)
+set(_usdOtioDirectory resources)
 
 install(
     FILES
@@ -9,7 +9,7 @@ install(
     ${_usdOtioDirectory}/plugInfo.json
     ${_usdOtioDirectory}/schema.usda
     
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/usd/examples/plugin/usdOtio
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/usd/examples/plugin/usdotio
 )
 
 

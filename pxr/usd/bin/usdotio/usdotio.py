@@ -51,7 +51,7 @@ install_path = os.path.sep.join(path_parts)
 #
 # Otio plugin dir
 #
-share_parts = [install_path, 'share', 'usd', 'examples', 'plugin', 'usdOtio']
+share_parts = [install_path, 'share', 'usd', 'examples', 'plugin', 'usdotio']
 otio_plugin_dir = os.path.sep.join(share_parts)
 
 #
