@@ -23,6 +23,8 @@
 
 import json
 
+import opentimelineio as otio
+
 from .named_base import NamedBase
 from .time_range_mixin import TimeRangeMixin
 
@@ -30,11 +32,16 @@ class Marker(NamedBase, TimeRangeMixin):
     """Class defining a marker (an annotation in the timeline/track/item).
 
     """
-
     
     FILTER_KEYS = [
         'marked_range',
     ]
+    
+    def __init__(self, otio_item = None):
+        super().__init__(otio_item)
+        if not otio_item:
+            self.jsonData = \
+                json.loads(otio.schema.Marker().to_json_string())
 
     def from_usd(self, usd_prim):
         super().from_usd(usd_prim)

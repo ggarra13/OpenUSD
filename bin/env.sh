@@ -14,6 +14,6 @@ export INSTALL=$ROOT/install
 export BUILD=$INSTALL/build/OpenUSD
 
 export PYTHONPATH=$INSTALL/lib/python:$PYTHONPATH
-export PXR_PLUGINPATH_NAME=$INSTALL/share/usd/examples/plugin/usdOtio:$PXR_PLUGINPATH_NAME
+export PXR_PLUGINPATH_NAME=$INSTALL/share/usd/examples/plugin/usdotio:$PXR_PLUGINPATH_NAME
 export PATH=$INSTALL/bin:$PATH
 

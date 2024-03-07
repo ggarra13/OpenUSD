@@ -23,11 +23,18 @@
 
 import json
 
+import opentimelineio as otio
+
 from .media_reference import MediaReference
 
 class ExternalReference(MediaReference):
     """Class that handles an external media reference, like a video.
     """
+    def __init__(self, otio_item = None):
+        super().__init__(otio_item)
+        if not otio_item:
+            self.jsonData = \
+                json.loads(otio.schema.ExternalReference().to_json_string())
 
     def to_usd(self, stage, usd_path):
         super().to_usd(stage, usd_path)

@@ -23,11 +23,18 @@
 
 import json
 
+import opentimelineio as otio
+
 from .media_reference import MediaReference
 
 class MissingReference(MediaReference):
     """Class defining a missing reference (ie. one that could not be loaded?)
     """
+    def __init__(self, otio_item = None):
+        super().__init__(otio_item)
+        if not otio_item:
+            self.jsonData = \
+                json.loads(otio.schema.MissingReference().to_json_string())
 
     def to_usd(self, stage, usd_path):
         super().to_usd(stage, usd_path)

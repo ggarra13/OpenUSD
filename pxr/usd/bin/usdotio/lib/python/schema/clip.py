@@ -43,6 +43,8 @@ class Clip(Item, Box2dMixin):
     def __init__(self, otio_item = None):
         super().__init__(otio_item)
         self.media_references = {}
+        if not otio_item:
+            self.jsonData = json.loads(otio.schema.Clip().to_json_string())
 
     def append_media_reference(self, ref_prim, key = 'DEFAULT_MEDIA'):
         self.media_references[key] = ref_prim
