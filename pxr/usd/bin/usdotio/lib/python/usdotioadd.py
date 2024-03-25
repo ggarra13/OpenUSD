@@ -180,7 +180,24 @@ class UsdOtioAdd:
                 self.recurse_track(stage, track_path, child)
             else:
                 self.process_child(stage, stack_path, child)
-            
+
+    def recurse_timeline(self, stage, usd_path, timeline):
+        usd_otio_item = Timeline(timeline)
+        usd_otio_item.to_usd(stage, usd_path)
+
+        # Check if there's a stacks attribute.
+        stack = None
+        stack_path = usd_path + '/Stack'
+        
+        stack = timeline.tracks
+        if stack:
+            usd_stack_item = Stack(stack)
+        else:
+            usd_stack_item = Stack(otio.schema.Stack())
+        usd_stack_item.to_usd(stage, stack_path)
+
+        self.recurse_stack(stage, stack_path, stack)
+                
     def run(self):
         """
         Run the otio add algorithm.
@@ -228,22 +245,10 @@ Valid OtioTimeline primitives in stage:''')
                 if not found:
                     print('\tNone')
                 exit(1)
-        
-        usd_otio_item = Timeline(timeline)
-        usd_otio_item.to_usd(stage, usd_path)
 
-        # Check if there's a stacks attribute.
-        stack = None
-        stack_path = usd_path + '/Stack'
-        
-        stack = timeline.tracks
-        if stack:
-            usd_stack_item = Stack(stack)
-        else:
-            usd_stack_item = Stack(otio.schema.Stack())
-        usd_stack_item.to_usd(stage, stack_path)
 
-        self.recurse_stack(stage, stack_path, stack)
+        self.recurse_timeline(stage, usd_path, timeline)
+        
         
         #
         # Export modified stage to output file

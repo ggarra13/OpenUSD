@@ -1,4 +1,4 @@
-#!/pxrpythonsubst
+#!/usr/bin/python3.10
 #
 # Copyright 2024 Gonzalo Garramuño for Signly
 #
@@ -23,7 +23,7 @@
 # language governing permissions and limitations under the Apache License.
 #
 
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 
 
 
@@ -91,13 +91,14 @@ Check PATH on Windows.
 from usdotio.schema.options import Options, LogLevel
 from usdotio.usdotioadd import UsdOtioAdd
 from usdotio.usdotiosave import UsdOtioSave
+from usdotio.usdotioupdate import UsdOtioUpdate
 
 class UsdOtio:
     """
     Class to add or extract an .otio json data file from a .usd fle
     """
     def __init__(self):
-        self.path = self.output_file = None
+        self.path = self.output_file = self.otio_file = None
         self.parse_arguments()
         self.run()
 
@@ -111,8 +112,8 @@ class UsdOtio:
                                 self.noComment)
         elif self.mode == 'save':
             engine = UsdOtioSave(self.usd_file, self.otio_file, self.path)
-        elif self.mode == 'v2':
-            raise RuntimeError('Uninplemented mode yet - Try later!')
+        elif self.mode == 'update':
+            engine = UsdOtioUpdate(self.usd_file, self.output_file, self.path)
         else:
             raise RuntimeError('Uninplemented mode yet - Patches welcome!')
         engine.run()
@@ -274,27 +275,31 @@ class UsdOtio:
                                  'the usd file was generated')
         
         #
-        # 'v2' parser
+        # 'update' parser
         #
-        v2_parser = subparsers.add_parser('v2', help='Omniverse v2 sequencer to .otio conversion mode')
-        v2_parser.add_argument('-v', '--log', nargs='?',
+        update_parser = subparsers.add_parser('update', help='Omniverse update sequencer to .otio conversion mode')
+        update_parser.add_argument('-v', '--log', nargs='?',
                                default=LogLevel.NORMAL, dest='verbose',
                                type=self.parse_verbosity,
                                  help='Set verbosity level: ' \
                                  'debug trace verbose info normal quiet ' \
                                  'or integer value')
-        v2_parser.add_argument('-y', '--yes', action='store_true',
+        update_parser.add_argument('-y', '--yes', action='store_true',
                                help='Answer yes to all questions')
-        v2_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
-                               const='/otio', 
-                               help='USD path to attach or extract .otio '
+        update_parser.add_argument('-p', '--usd-path', type=str, nargs='?',
+                               const='/Sequence', 
+                               help='USD path to attach or extract Sequencer '
                                'primitive to.  If no path provides, defaults '
-                               'to "/".')
-        v2_parser.add_argument('usd_file', type=str, help='Name of .usd file to add or extract otio data')
-        v2_parser.add_argument('-o', '--usd-output-file', type=str, nargs='?',
-                               help='USD output file.  '
-                               'If no output file is provided, defaults to'
-                               'overwrite the same usd file.')
+                               'to "/Sequence".')
+        update_parser.add_argument('usd_file', type=str, help='Name of .usd file to add or extract otio data')
+        update_parser.add_argument('-o', '--usd-output-file', type=str,
+                                   nargs='?',
+                                   help='USD output file.  '
+                                   'If no output file is provided, defaults to'
+                                   'overwrite the same usd file.')
+        update_parser.add_argument('-n', '--noComment', action='store_true',
+                                   help='do not write a comment specifying how ' \
+                                   'the usd file was generated')
         
         args = parser.parse_args()
 
@@ -309,13 +314,13 @@ class UsdOtio:
         Options.log_level = args.verbose
         Options.yes = args.yes
         self.usd_file = args.usd_file
+        self.path = args.usd_path
 
         if self.mode != 'save':
             self.output_file = args.usd_output_file
             self.noComment = args.noComment
 
-        if self.mode != 'v2':
-            self.path = args.usd_path
+        if self.mode != 'update':
             self.otio_file = args.otio_file
             
         if not self.output_file:
@@ -361,7 +366,11 @@ class UsdOtio:
             if self.path[0] != '/':
                 self.path = '/' + self.path
         else:
-            self.path = '/otio'
+            if self.mode != 'update':
+                self.path = '/otio'
+            else:
+                self.path = '/Sequence'
+            
                 
             if self.mode == "add":
                 if Options.log_level >= LogLevel.INFO.value:

@@ -56,14 +56,7 @@ Please run:
 #
 # usdotio helper classes' imports here
 #
-from usdotio.schema.clip import Clip
-from usdotio.schema.gap import Gap
-from usdotio.schema.options import Options, LogLevel
-from usdotio.schema.stack import Stack
 from usdotio.schema.timeline import Timeline
-from usdotio.schema.transition import Transition
-from usdotio.schema.track import Track
-from usdotio.schema.effect import Effect
     
 class UsdOtioSave:
     """Class used to save (extract) an OpenTimelineIO (.otio) file from an
