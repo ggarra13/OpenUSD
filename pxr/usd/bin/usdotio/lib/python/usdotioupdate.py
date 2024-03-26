@@ -25,7 +25,7 @@
 #
 # Normal python imports
 #
-import sys, os
+import sys, os, math
 
 #
 # USD imports
@@ -67,8 +67,13 @@ from usdotio.schema.track import Track
 from usdotio.schema.functions import *
 from usdotio.usdotioadd import UsdOtioAdd
 
+#
+# usdotio's omni classes should go here, but to simplify we are using
+# string comparisons against CONSTANTS
+#
+import usdotio.schema.omni as omnischema
 
-    
+
     
 class UsdOtioUpdate:
     """A class to update an .usd file with sequencer information to a .usd
@@ -87,27 +92,53 @@ class UsdOtioUpdate:
         """
 
         #
-        # Store these for easy access.
+        # Store these user parameters for easy access.
         #
         self.usd_file = usd_file
         self.output_file = output_file
         self.path = path
         self.comment = not comment
-        self.timeline = None
-        self.tracks   = []
-        self.asset_clip = None
 
         #
-        # USD classes and properties
+        # OpenTimelineIO auxiliary variables 
         #
-        self.usd_sequence = None
+        self.timeline = None
+        self.tracks   = []
+        self.clip     = None
+        self.available_range = None
+        self.current_time = 0.0
+
+        #
+        # USD stage properties
+        #
         self.startTimecode = 1
         self.endTimecode = 1000
         self.fps = 24.0
+
+    def add_gap(self, track, index, duration):
+        source_range = otime.TimeRange(otime.RationalTime(0.0, self.fps),
+                                       otime.RationalTime(duration, self.fps))
+        
+        gap = otio.schema.Gap()
+        gap.source_range = source_range
+
+        track.insert(index, gap)
         
         
-    def process_asset(self, stage, asset_path, asset_prim):
-        pass
+    def process_omnisound(self, stage, asset_path, asset_prim):
+        name = asset_prim.GetName()
+        
+        target_url = get_asset(asset_prim, 'filePath')
+        media = otio.schema.ExternalReference(target_url)
+        media.name = name
+        
+
+        if self.available_range:
+            media.available_range = self.available_range
+            
+        self.clip.media_reference = media
+
+        
         
     def process_asset_clip(self, stage, track_path, asset_clip_prim):
         startTime = get_timecode(asset_clip_prim, 'startTime')
@@ -116,66 +147,128 @@ class UsdOtioUpdate:
         playStart = get_timecode(asset_clip_prim, 'playStart')
         playEnd = get_timecode(asset_clip_prim, 'playEnd')
 
+        #
+        # Update current time to start of this asset
+        #
+        self.current_time = startTime - self.startTimecode
+
         source_range = otime.TimeRange.range_from_start_end_time_inclusive(
             otime.RationalTime(startTime, self.fps),
             otime.RationalTime(endTime, self.fps))
 
-        clip = otio.schema.Clip()
-        clip.source_range = source_range
+        self.available_range = None
+        
+        if not math.isnan(playStart) or not math.isnan(playEnd):
 
+            if math.isnan(playStart):
+                playStart = startTime
+
+            if math.isnan(playEnd):
+                playEnd = endTime
+                
+            self.available_range = \
+                otime.TimeRange.range_from_start_end_time_inclusive(
+                otime.RationalTime(playStart, self.fps),
+                otime.RationalTime(playEnd, self.fps))
+
+        name = asset_clip_prim.GetName()
+        
+        self.clip = otio.schema.Clip()
+        self.clip.name = name
+        self.clip.source_range = source_range
+
+        valid_asset = False
         for usd_prim in asset_clip_prim.GetChildren():
             usd_type = usd_prim.GetTypeName()
             usd_path = usd_prim.GetPath()
-            self.process_asset(stage, usd_path, usd_prim)
+            if usd_type == omnischema.OMNI_SOUND:
+                self.process_omnisound(stage, usd_path, usd_prim)
+                valid_asset = True
+                break
+            else:
+                pass
+
+        track = self.tracks[-1]
         
-        self.tracks[-1].append(clip)
-        pass
+        if valid_asset:
+            #
+            # Add the clip at the end
+            #
+            track.append(self.clip)
+
+            #
+            # Check if its start time is less than our current time
+            #
+            trimmed_range = self.clip.trimmed_range_in_parent()
+            clip_start_time = trimmed_range.start_time.value
+            if clip_start_time < self.current_time:
+                gap_duration = self.current_time - clip_start_time
+                previous_to_last_child = len(track) - 1
+                self.add_gap(track, previous_to_last_child, gap_duration)
+        else:
+            print(f'Warning: AssetClip found but without a valid Asset')
+
+        # Reset clip
+        self.clip = None
+
+        
                     
     def recurse_track(self, stage, track_path, track_prim):
         track_usd_type = track_prim.GetAttribute('trackType').Get()
 
-        if track_usd_type != 'Audio' and track_usd_type != 'Video':
+        if track_usd_type != omnischema.TRACK_AUDIO_TYPE and \
+           track_usd_type != omnischema.TRACK_VIDEO_TYPE:
             return
 
-        track_type = track_usd_type
+        track_kind = track_usd_type
 
-        print(f'Processing track {track_type}')
+        name = track_prim.GetName()
         
-        name = track_prim.GetAttribute('label').Get()
-        track = otio.schema.Track(name, None, None, track_type)
+        track = otio.schema.Track()
+        track.name = name
+        track.kind = track_type
+
+        #
+        # Store the track in our internal list
+        #
         self.tracks.append(track)
 
         
         for usd_prim in track_prim.GetAllChildren():
             usd_path  = usd_prim.GetPath()
             prim_type = usd_prim.GetTypeName()
-            if prim_type == 'AssetClip':
+            if prim_type == omnischema.ASSET_CLIP:
                 self.process_asset_clip(stage, usd_path, usd_prim)
 
     def recurse_sequence(self, stage, sequence_prim):
         self.timeline = otio.schema.Timeline()
 
-        self.usd_sequence = sequence_prim
-
         #
-        # Get global timing information for Sequence
+        # Get global timing information for Stage
         #
         self.startTimecode = stage.GetStartTimeCode()
         self.endTimecode = stage.GetEndTimeCode()
         self.fps         = stage.GetTimeCodesPerSecond()
-        
+
+        #
+        # Look for omni Tracks
+        #
         for usd_prim in sequence_prim.GetAllChildren():
             usd_path  = usd_prim.GetPath()
             prim_type = usd_prim.GetTypeName()
-            if prim_type == 'Track':
+            if prim_type == omnischema.TRACK:
+                self.current_time = 0.0
                 self.recurse_track(stage, usd_path, usd_prim)
 
+        #
+        # Create a dummy OTIO Stack and append all valid OTIO Tracks
+        #
         stack = otio.schema.Stack()
         for track in self.tracks:
             stack.append(track)
         self.timeline.tracks = stack
-        pass
-    
+        
+        
     def run(self):
         """
         Run the otio add algorithm.
@@ -200,7 +293,7 @@ path or an already existing Sequence primitive.
 Valid Sequence primitives in stage:''')
             found = False
             for x in stage.Traverse():
-                if x.GetTypeName() == 'Sequence':
+                if x.GetTypeName() == omnischema.SEQUENCE:
                     print(f'\t{x} is a Sequence primitive.')
                     found = True
             if not found:
@@ -210,7 +303,7 @@ Valid Sequence primitives in stage:''')
         
         if usd_prim: 
             prim_type = usd_prim.GetTypeName()
-            if prim_type !=  'Sequence':
+            if prim_type !=  omnischema.SEQUENCE:
                 print(f'''USD path "{usd_path}" already has a primitive, 
 of type {prim_type}!
 
@@ -229,7 +322,17 @@ Valid Sequence primitives in stage:''')
 
         
         self.recurse_sequence(stage, usd_prim)
-                
+
+        otio_add = UsdOtioAdd(self.output_file, None, self.output_file, '/',
+                              not self.comment)
+        
+        otio_add.recurse_timeline(stage, '/otio', self.timeline)
+
+        #
+        # Remove the whole Sequence information
+        #
+        stage.RemovePrim(usd_path)
+        
         #
         # Export modified stage to output file
         #
