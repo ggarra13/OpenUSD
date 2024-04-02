@@ -51,7 +51,7 @@ class Marker(NamedBase, TimeRangeMixin):
         #
         for x in usd_prim.GetChildren():
             usd_type = x.GetTypeName()
-            if usd_type == 'OtioTimeRange':
+            if x.IsA('OtioTimeRange'):
                 usd_name = x.GetName()
                 self.jsonData[usd_name] = self._create_time_range(x)
             else:

@@ -263,7 +263,7 @@ Valid OtioTimeline primitives in stage:''')
             #
             if os.path.isfile(self.output_file):
                 if Options.log_level >= LogLevel.NORMAL:
-                    print(f'"{self.otio_file}" already exists!  '
+                    print(f'"{self.output_file}" already exists!  '
                           'Will overwrite it.')
                     Options.continue_prompt()
                 

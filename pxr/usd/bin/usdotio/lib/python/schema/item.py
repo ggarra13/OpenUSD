@@ -72,22 +72,21 @@ class Item(Composable, TimeRangeMixin):
         #
         # Traverse the stage to get the jsonData of each node
         #
-        for x in usd_prim.GetChildren():
-            usd_type = x.GetTypeName()
-            if usd_type == 'OtioTimeRange':
-                usd_name = x.GetName()
-                self.jsonData[usd_name] = self._create_time_range(x)
-            elif usd_type == 'OtioLinearTimeWarp':
+        for child in usd_prim.GetChildren():
+            if child.IsA('OtioTimeRange'):
+                usd_name = child.GetName()
+                self.jsonData[usd_name] = self._create_time_range(child)
+            elif child.IsA('OtioLinearTimeWarp'):
                 timewarp_prim = LinearTimeWarp()
-                timewarp_prim.from_usd(x)
+                timewarp_prim.from_usd(child)
                 self.append_effect(timewarp_prim)
-            elif usd_type == 'OtioEffect':
+            elif child.IsA('OtioEffect'):
                 effect_prim = Effect()
-                effect_prim.from_usd(x)
+                effect_prim.from_usd(child)
                 self.append_effect(effect_prim)
-            elif usd_type == 'OtioMarker':
+            elif child.IsA('OtioMarker'):
                 marker_prim = Marker()
-                marker_prim.from_usd(x)
+                marker_prim.from_usd(child)
                 self.append_marker(marker_prim)
             else:
                 pass

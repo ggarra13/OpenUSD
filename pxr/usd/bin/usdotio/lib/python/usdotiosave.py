@@ -57,6 +57,7 @@ Please run:
 # usdotio helper classes' imports here
 #
 from usdotio.schema.timeline import Timeline
+from usdotio.schema.options import Options, LogLevel
     
 class UsdOtioSave:
     """Class used to save (extract) an OpenTimelineIO (.otio) file from an

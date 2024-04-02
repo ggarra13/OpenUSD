@@ -52,7 +52,7 @@ class Transition(NamedBase, RationalTimeMixin):
         
         for child in usd_prim.GetChildren():
             usd_type = child.GetTypeName()
-            if usd_type == 'OtioRationalTime':
+            if child.IsA('OtioRationalTime'):
                 usd_name = child.GetName()
                 self.jsonData[usd_name] = self._create_rational_time(child)
             else:

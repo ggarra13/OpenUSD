@@ -48,8 +48,7 @@ class Box2d(Base):
         
     def from_usd(self, usd_prim):
         for x in usd_prim.GetChildren():
-            usd_type = x.GetTypeName()
-            if usd_type == 'OtioV2d':
+            if x.IsA('OtioV2d'):
                 time = RationalTime()
                 usd_name = x.GetName()
                 self.jsonData[usd_name] = time.from_usd(x)

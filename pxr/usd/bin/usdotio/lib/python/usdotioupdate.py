@@ -69,7 +69,7 @@ from usdotio.usdotioadd import UsdOtioAdd
 
 #
 # usdotio's omni classes should go here, but to simplify we are using
-# string comparisons against CONSTANTS
+# IsA() comparisons against string CONSTANTS
 #
 import usdotio.schema.omni as omnischema
 
@@ -122,7 +122,10 @@ class UsdOtioUpdate:
         gap = otio.schema.Gap()
         gap.source_range = source_range
 
-        track.insert(index, gap)
+        if index >= 0:
+            track.insert(index, gap)
+        else:
+            track.append(gap)
         
         
     def process_omnisound(self, stage, asset_path, asset_prim):
@@ -179,9 +182,8 @@ class UsdOtioUpdate:
 
         valid_asset = False
         for usd_prim in asset_clip_prim.GetChildren():
-            usd_type = usd_prim.GetTypeName()
             usd_path = usd_prim.GetPath()
-            if usd_type == omnischema.OMNI_SOUND:
+            if usd_prim.IsA(omnischema.OMNI_SOUND):
                 self.process_omnisound(stage, usd_path, usd_prim)
                 valid_asset = True
                 break
@@ -216,8 +218,8 @@ class UsdOtioUpdate:
     def recurse_track(self, stage, track_path, track_prim):
         track_usd_type = track_prim.GetAttribute('trackType').Get()
 
-        if track_usd_type != omnischema.TRACK_AUDIO_TYPE and \
-           track_usd_type != omnischema.TRACK_VIDEO_TYPE:
+        if not track_prim.IsA(omnischema.TRACK_AUDIO_TYPE) and \
+           not track_prim.IsA(omnischema.TRACK_VIDEO_TYPE):
             return
 
         track_kind = track_usd_type
@@ -226,7 +228,7 @@ class UsdOtioUpdate:
         
         track = otio.schema.Track()
         track.name = name
-        track.kind = track_type
+        track.kind = track_kind
 
         #
         # Store the track in our internal list
@@ -236,10 +238,16 @@ class UsdOtioUpdate:
         
         for usd_prim in track_prim.GetAllChildren():
             usd_path  = usd_prim.GetPath()
-            prim_type = usd_prim.GetTypeName()
-            if prim_type == omnischema.ASSET_CLIP:
+            if usd_prim.IsA(omnischema.ASSET_CLIP):
                 self.process_asset_clip(stage, usd_path, usd_prim)
 
+        track_duration = track.duration().value
+        sequence_duration = self.endTimecode - self.startTimecode
+        if track_duration < sequence_duration:
+            gap_duration = sequence_duration - track_duration
+            self.add_gap(track, -1, gap_duration)
+            
+                
     def recurse_sequence(self, stage, sequence_prim):
         self.timeline = otio.schema.Timeline()
 
@@ -255,8 +263,7 @@ class UsdOtioUpdate:
         #
         for usd_prim in sequence_prim.GetAllChildren():
             usd_path  = usd_prim.GetPath()
-            prim_type = usd_prim.GetTypeName()
-            if prim_type == omnischema.TRACK:
+            if usd_prim.IsA(omnischema.TRACK):
                 self.current_time = 0.0
                 self.recurse_track(stage, usd_path, usd_prim)
 
@@ -293,7 +300,7 @@ path or an already existing Sequence primitive.
 Valid Sequence primitives in stage:''')
             found = False
             for x in stage.Traverse():
-                if x.GetTypeName() == omnischema.SEQUENCE:
+                if x.IsA(omnischema.SEQUENCE):
                     print(f'\t{x} is a Sequence primitive.')
                     found = True
             if not found:
@@ -303,7 +310,7 @@ Valid Sequence primitives in stage:''')
         
         if usd_prim: 
             prim_type = usd_prim.GetTypeName()
-            if prim_type !=  omnischema.SEQUENCE:
+            if not usd_prim.IsA(omnischema.SEQUENCE):
                 print(f'''USD path "{usd_path}" already has a primitive, 
 of type {prim_type}!
 
