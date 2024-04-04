@@ -1,5 +1,14 @@
 
 
+def get_optional_timecode(usd_prim, usd_attr):
+    attr = usd_prim.GetAttribute(usd_attr)
+    if not attr:
+        return None
+    attr = attr.Get()
+    if not attr:
+        return None
+    return attr.GetValue()
+
 def get_timecode(usd_prim, usd_attr):
     attr = usd_prim.GetAttribute(usd_attr)
     if not attr:
@@ -7,7 +16,7 @@ def get_timecode(usd_prim, usd_attr):
         return None
     attr = attr.Get()
     if not attr:
-        print(f'{usd_prim} Invalid timecode read attribute "{attr}"')
+        print(f'{usd_prim} Invalid timecode "{usd_attr}" read attribute "{attr}"')
         return 0.0
     return attr.GetValue()
 
@@ -26,7 +35,7 @@ def get_asset(usd_prim, usd_attr):
         return None
     attr = attr.Get()
     if not attr:
-        print(f'{usd_prim} Invalid read asset attribute "{attr}"')
+        print(f'{usd_prim} Invalid read asset "usd_attr" attribute "{attr}"')
         return None
     value = attr.path
     return value
