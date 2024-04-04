@@ -37,16 +37,20 @@ import stat
 import shutil
 
 PYTHON_DIRS = [
-    'pxr/usd/bin/usdotio/usdOtio/python'
+    'pxr/usd/bin/usdotio/',
+    'pxr/usd/bin/usdotio/lib/python',
+    'pxr/usd/bin/usdotio/lib/python/schema/',
 ]
 
 def process_python_files():
   for python_dir in PYTHON_DIRS:
+      print(f'Processing {python_dir}') 
       python_files = glob.glob( python_dir + "/*.py" )
 
       files = python_files
 
       for f in files:
+        
             with open( f, encoding='utf-8' ) as ip:
                 text = ip.read()
             with open( f + ".new", "w", encoding='utf-8' ) as out:
