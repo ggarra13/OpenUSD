@@ -1,6 +1,6 @@
 #!/usr/bin/python3.10
 #
-# Copyright 2024 Gonzalo Garramuño for Signly, Ltd.
+# Copyright 2024 Gonzalo Garramuño for Signly
 #
 # Licensed under the Apache License, Version 2.0 (the "Apache License")
 # with the following modification; you may not use this file except in
@@ -139,15 +139,15 @@ class UsdOtio:
                   'Otio primitive.\n')
             print('Valid Otio primitives in stage:\n')
             for x in stage.Traverse():
-                if x.IsA('OtioTimeline'):
-                    print(f'\t{x} is an OtioTimeline primitive.')
+                if x.GetTypeName() == 'Otio':
+                    print(f'\t{x} is an Otio primitive.')
             exit(1)
 
         #
         # Check we have an Otio primitive
         #
-        if not usd_prim.IsA('OtioTimeline'):
-            prim_type = usd_prim.GetTypeName()
+        prim_type = usd_prim.GetTypeName()
+        if prim_type != 'OtioTimeline':
             print(f'Invalid Otio primitive type. Is {prim_type}. ')
             exit(1)
 
